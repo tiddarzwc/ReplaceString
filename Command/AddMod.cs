@@ -5,6 +5,10 @@ using DebugCommands.Flow.CommandFlows;
 using DebugCommands.Flow.DataFlows;
 using ReplaceString.Config;
 using Terraria;
+using System.Reflection;
+using Terraria.ModLoader.Config;
+using System.Threading;
+using System;
 
 namespace ReplaceString.Command
 {
@@ -31,6 +35,8 @@ namespace ReplaceString.Command
             {
                 list.Add(new ModDefinition(mod.Name));
                 Main.NewText("Success");
+                typeof(ConfigManager).GetMethod("Save", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, ModContent.GetInstance<ReplaceStringConfig>());
             }
         }
     }
@@ -62,6 +68,8 @@ namespace ReplaceString.Command
             {
                 list.RemoveAll(d => d.modName == mod);
                 Main.NewText("Success");
+                typeof(ConfigManager).GetMethod("Save", BindingFlags.NonPublic | BindingFlags.Static)
+                    .Invoke(null, ModContent.GetInstance<ReplaceStringConfig>());
             }
             else
             {
