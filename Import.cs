@@ -34,7 +34,7 @@ namespace ReplaceString
             {
                 foreach (var hook in hookList[mod])
                 {
-                    hook.Undo();
+                    hook.Dispose();
                 }
                 hookList[mod].Clear();
             }

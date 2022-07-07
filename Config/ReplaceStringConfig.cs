@@ -1,14 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
+using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader.Config;
 
-namespace ReplaceString
+namespace ReplaceString.Config
 {
     public class ReplaceStringConfig : ModConfig
     {
-        [JsonDefaultListValue("[]")]
-        public List<string> AutoloadModList = new List<string>();
+        [Label("Autoload Mods")]
+        [CustomModConfigItem(typeof(ModDefinitionListElement))]
+        public List<ModDefinition> AutoloadModList = new List<ModDefinition>();
         public override ConfigScope Mode => ConfigScope.ClientSide;
         public static ReplaceStringConfig Config { get; private set; }
 
@@ -19,7 +21,11 @@ namespace ReplaceString
         public override void OnChanged()
         {
             //var modList = ModLoader.Mods.Select(mod => mod.Name);
-            AutoloadModList = new HashSet<string>(AutoloadModList).ToList();
+            AutoloadModList = AutoloadModList.ToHashSet().ToList();
+            if (!Main.gameMenu && Main.netMode != NetmodeID.Server)
+            {
+                Main.NewText("Please reload mod");
+            }
         }
     }
 }

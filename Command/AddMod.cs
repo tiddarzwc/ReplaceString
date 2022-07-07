@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DebugCommands.Flow.ActionFlows;
 using DebugCommands.Flow.CommandFlows;
 using DebugCommands.Flow.DataFlows;
+using ReplaceString.Config;
 using Terraria;
 
 namespace ReplaceString.Command
@@ -20,13 +22,14 @@ namespace ReplaceString.Command
         {
             var mod = (Mod)((object[])ReplaceString.Command.Call("Arguement"))[0];
             var list = ModContent.GetInstance<ReplaceStringConfig>().AutoloadModList;
-            if (list.Contains(mod.Name))
+            var names = list.Select(d => d.modName);
+            if (names.Contains(mod.Name))
             {
                 Main.NewText("Same modname exists");
             }
             else
             {
-                list.Add(mod.Name);
+                list.Add(new ModDefinition(mod.Name));
                 Main.NewText("Success");
             }
         }
@@ -36,12 +39,12 @@ namespace ReplaceString.Command
         public override string HelpInfo => "(ModName)";
         public override IEnumerable<string> GetAutoComplete()
         {
-            return ModContent.GetInstance<ReplaceStringConfig>().AutoloadModList;
+            return ModContent.GetInstance<ReplaceStringConfig>().AutoloadModList.Select(d => d.modName);
         }
         public override bool TryFlow(in string input)
         {
             string name = GetInput(input);
-            if (ModContent.GetInstance<ReplaceStringConfig>().AutoloadModList.Contains(name))
+            if (ModContent.GetInstance<ReplaceStringConfig>().AutoloadModList.Any(d => d.modName == name))
             {
                 obj = name;
                 return true;
@@ -55,9 +58,9 @@ namespace ReplaceString.Command
         {
             var mod = (string)((object[])ReplaceString.Command.Call("Arguement"))[0];
             var list = ModContent.GetInstance<ReplaceStringConfig>().AutoloadModList;
-            if (list.Contains(mod))
+            if (list.Any(d => d.modName == mod))
             {
-                list.Remove(mod);
+                list.RemoveAll(d => d.modName == mod);
                 Main.NewText("Success");
             }
             else

@@ -1,4 +1,4 @@
 displayName = Replace String
 author = ye_you
 version = 0.1
-modReferences = DebugCommands, TestMod
+modReferences = DebugCommands

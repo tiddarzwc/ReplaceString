@@ -8,6 +8,7 @@ using DebugCommands.Flow.DataFlows;
 using Hjson;
 using MonoMod.RuntimeDetour;
 using ReplaceString.Command;
+using ReplaceString.Config;
 using Terraria;
 using Terraria.Localization;
 
@@ -204,17 +205,24 @@ namespace ReplaceString
     public class ReplaceString : Mod
     {
         public static Mod Command;
+        public List<Hook> hooks;
+        public ModCatcher catcher;
+        private static ReplaceString instance;
+        public static ReplaceString Instance => instance;
+        public static ModCatcher Catcher => instance.catcher;
         public delegate void Autoload(Mod mod);
         public ReplaceString()
         {
-
+            instance = this;
             MonoModHooks.RequestNativeAccess();
+            catcher = new ModCatcher();
+            hooks = new List<Hook>();
             Import import = null;
             bool hasReplace = false;
-            _ = new Hook(typeof(Mod).GetMethod("Autoload", BindingFlags.Instance | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
+            hooks.Add(new Hook(typeof(Mod).GetMethod("Autoload", BindingFlags.Instance | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
             {
                 string fileName = $"{Main.SavePath}/Mods/ReplaceString/{mod.Name}_{Language.ActiveCulture.Name}.hjson";
-                if (!ReplaceStringConfig.Config.AutoloadModList.Contains(mod.Name) || !File.Exists(fileName))
+                if (!ReplaceStringConfig.Config?.AutoloadModList.Any(d => d.modName == mod.Name) ?? false || !File.Exists(fileName))
                 {
                     orig(mod);
                     return;
@@ -232,8 +240,8 @@ namespace ReplaceString
                 {
                     ;
                 }
-            });
-            _ = new Hook(typeof(LocalizationLoader).GetMethod("Autoload", BindingFlags.Static | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
+            }));
+            hooks.Add(new Hook(typeof(LocalizationLoader).GetMethod("Autoload", BindingFlags.Static | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
             {
                 orig(mod);
                 if (hasReplace)
@@ -247,7 +255,7 @@ namespace ReplaceString
                         ;
                     }
                 }
-            });
+            }));
 
         }
         public override void Load()
@@ -262,6 +270,12 @@ namespace ReplaceString
         public override void Unload()
         {
             Command = null;
+            foreach(var hook in hooks)
+            {
+                hook.Dispose();
+            }
+            hooks = null;
+            catcher.Unload();
         }
 
     }
