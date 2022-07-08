@@ -224,22 +224,22 @@ namespace ReplaceString
             ilHooks = new List<ILHook>();
             Import import = null;
             bool hasReplace = false;
-            hooks.Add(new Hook(typeof(LocalizationLoader).GetMethod("Autoload", BindingFlags.Static | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
+            hooks.Add(new Hook(typeof(Mod).GetMethod("Autoload", BindingFlags.Instance | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
             {
                 orig(mod);
                 if (hasReplace)
                 {
                     try
                     {
-                        import.PreModLoad();
+                        import.PostModLoad();
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        ;
+                        Logger.Error($"Post Load Error : {ex}");
                     }
                 }
             }));
-            
+
             ilHooks.Add(new ILHook(typeof(AssemblyManager).GetMethod("Instantiate", BindingFlags.Static | BindingFlags.NonPublic), il =>
             {
                 var cursor = new ILCursor(il);
@@ -250,6 +250,7 @@ namespace ReplaceString
                 cursor.Emit(OpCodes.Callvirt, type.GetProperty("Name", BindingFlags.Public | BindingFlags.Instance).GetMethod);
                 cursor.EmitDelegate((Assembly asm, string name) =>
                 {
+                    Logger.Info(name);
                     string fileName = $"{Main.SavePath}/Mods/ReplaceString/{name}_{Language.ActiveCulture.Name}.hjson";
                     if (!ReplaceStringConfig.Config?.AutoloadModList.Any(d => d.Name == name) ?? false || !File.Exists(fileName))
                     {
@@ -260,17 +261,17 @@ namespace ReplaceString
                     {
                         import = new Import(HjsonValue.Load(file));
                     }
-                    catch
+                    catch (Exception ex)
                     {
-
+                        Logger.Error($"Hjson Load Error : {ex}");
                     }
                     try
                     {
                         import.PostModLoad();
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        ;
+                        Logger.Error($"Pre Load Error : {ex}");
                     }
                     hasReplace = true;
                 });
@@ -286,11 +287,11 @@ namespace ReplaceString
         public override void Unload()
         {
             Command = null;
-            foreach(var hook in hooks)
+            foreach (var hook in hooks)
             {
                 hook.Dispose();
             }
-            foreach(var hook in ilHooks)
+            foreach (var hook in ilHooks)
             {
                 hook.Dispose();
             }
