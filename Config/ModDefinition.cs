@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Diagnostics;
+using System.Linq;
 using System.Text.Json.Serialization;
 using Terraria.ModLoader.IO;
 
@@ -6,17 +7,12 @@ namespace ReplaceString.Config
 {
     public class ModDefinition : TagSerializable
     {
-        [JsonIgnore]
-        public Mod mod;
-        [JsonIgnore]
-        public bool IsModLoaded => mod != null;
-        public string Name { get; set; }
-        public string DisplayName { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
         public ModDefinition(string modName, string displayName)
         {
             Name = modName;
             DisplayName = displayName;
-            mod = ModLoader.Mods.FirstOrDefault(mod => mod.Name == modName, null);
         }
 
         public TagCompound SerializeData()

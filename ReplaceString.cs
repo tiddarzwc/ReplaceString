@@ -269,8 +269,6 @@ namespace ReplaceString
             Command = ModLoader.GetMod("DebugCommands");
             Command.Call("Add", new ExportCommand() / new FindModFlow() * new ExportConfig() / new ExporAction());
             Command.Call("Add", new ImportCommand() / new FindModFlow() / new ImportAction());
-            Command.Call("Add", new AddMod() / new FindModFlow() / new AddAction());
-            Command.Call("Add", new RemoveMod() / new FindAddedMod() / new RemoveAction());
         }
 
         public override void Unload()
