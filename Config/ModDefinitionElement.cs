@@ -67,18 +67,16 @@ namespace ReplaceString.Config
         {
             base.OnInitialize();
 
-
             if (!ReplaceString.Catcher.modInfos.TryGetValue(value.Name, out var info))
             {
-                info = ModInfo.Default;
+                info = ModInfo.Default with { displayName = value.DisplayName };
+                
                 var deleteButton = new UIImageButton(ModContent.Request<Texture2D>("ReplaceString/DeleteButton", ReLogic.Content.AssetRequestMode.ImmediateLoad))
                 {
-                    Width = new StyleDimension(32, 0),
-                    Height = new StyleDimension(32, 0),
-                    VAlign = 0.5f,
-                    MarginLeft = Width.Pixels - 40
+                    MarginLeft = Parent.GetDimensions().Width - ICON_SPACE - 32,
+                    MarginTop = ICON_SPACE
                 };
-
+                deleteButton.OnClick += DeleteButton_OnClick;
                 Append(deleteButton);
             }
             var icon = new UIImage(info.icon)
@@ -90,13 +88,12 @@ namespace ReplaceString.Config
 
             Append(icon);
 
-            var text = new UIText($"{info.displayName}({value.modName})")
+            var text = new UIText($"{info.displayName}({value.Name})")
             {
                 MarginLeft = MOD_HEIGHT,
-                MarginTop = (MOD_HEIGHT - ICON_SIZE) / 2f,
                 TextColor = Color.White,
                 VAlign = 0.5f,
-                Height = new StyleDimension(ICON_SIZE, 0)
+                Height = new StyleDimension(0, 0)
             };
             Append(text);
 
@@ -123,10 +120,16 @@ namespace ReplaceString.Config
                 {
                     list.ModList.Remove(value);
                     list.OnChange();
+                    list.uiFilter.SetText("");
                 }
             };
         }
 
+        private void DeleteButton_OnClick(UIMouseEvent evt, UIElement listeningElement)
+        {
+            var list = Parent as ModDefinitionListElement;
+            list.ModList.Remove(value);
+        }
 
         public ModDefinitionElement(ModDefinition value)
         {

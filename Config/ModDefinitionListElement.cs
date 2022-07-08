@@ -17,9 +17,9 @@ namespace ReplaceString.Config
         public bool needUpdate = true;
         public bool filterHooked = false;
         public UIFocusInputTextFieldReplaced uiFilter = null;
-        public IEnumerable<string> GetUnAddedMod()
+        public IEnumerable<KeyValuePair<string, ModInfo>> GetUnAddedMod()
         {
-            return ReplaceString.Catcher.modInfos.Where(mod => Value.All(added => added.modName != mod.Key)).Select(mod => mod.Key);
+            return ReplaceString.Catcher.modInfos.Where(mod => mod.Key.ToLower().StartsWith(filterWord.ToLower()) || mod.Value.displayName.ToLower().StartsWith(filterWord.ToLower())).Where(mod => Value.All(added => added.Name != mod.Key));
         }
         public List<ModDefinition> ModList => Value;
         public override void OnInitialize()
@@ -88,16 +88,21 @@ namespace ReplaceString.Config
                 uiFilter = replace;
                 filterHooked = true;
             }
-            Height.Set(MOD_HEIGHT * (Value.Count + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2, 0);
-            if (Parent != null && Parent.Height.Pixels < Height.Pixels)
-            {
-                Parent.Height.Pixels = Height.Pixels;
-            }
+
             if (Value.Count != Elements.Count - 1)
             {
                 ResetChildren();
             }
             base.Update(gameTime);
+        }
+        public override void Recalculate()
+        {
+            Height.Set(MOD_HEIGHT * (Value.Count + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2, 0);
+            if (Parent != null)
+            {
+                Parent.Height.Pixels = Height.Pixels;
+            }
+            base.Recalculate();
         }
         public void ResetChildren()
         {

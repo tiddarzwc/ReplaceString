@@ -15,9 +15,9 @@ namespace ReplaceString.Config
         {
             base.OnActivate();
             Elements.Clear();
-            foreach (var mod in ModList.GetUnAddedMod().OrderBy(mod => mod))
+            foreach (var (mod, info) in ModList.GetUnAddedMod().OrderBy(mod => mod.Key))
             {
-                var ui = new ModDefinitionElement(new ModDefinition(mod))
+                var ui = new ModDefinitionElement(new ModDefinition(mod, info.displayName))
                 {
                     MarginTop = MOD_HEIGHT * Elements.Count + TEXT_HEIGHT,
                     Width = Width,
@@ -33,9 +33,9 @@ namespace ReplaceString.Config
             if(ModList.needUpdate)
             {
                 Elements.Clear();
-                foreach(var mod in ModList.GetUnAddedMod().Where(mod => mod.ToLower().StartsWith(ModList.filterWord.ToLower())).OrderBy(mod => mod))
+                foreach(var (mod, info) in ModList.GetUnAddedMod().OrderBy(mod => mod.Key))
                 {
-                    var ui = new ModDefinitionElement(new ModDefinition(mod))
+                    var ui = new ModDefinitionElement(new ModDefinition(mod, info.displayName))
                     {
                         MarginTop = MOD_HEIGHT * Elements.Count + TEXT_HEIGHT,
                         Width = Width,

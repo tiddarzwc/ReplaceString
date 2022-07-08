@@ -222,13 +222,19 @@ namespace ReplaceString
             hooks.Add(new Hook(typeof(Mod).GetMethod("Autoload", BindingFlags.Instance | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
             {
                 string fileName = $"{Main.SavePath}/Mods/ReplaceString/{mod.Name}_{Language.ActiveCulture.Name}.hjson";
-                if (!ReplaceStringConfig.Config?.AutoloadModList.Any(d => d.modName == mod.Name) ?? false || !File.Exists(fileName))
+                if (!ReplaceStringConfig.Config?.AutoloadModList.Any(d => d.Name == mod.Name) ?? false || !File.Exists(fileName))
                 {
                     orig(mod);
                     return;
                 }
                 using var file = new FileStream(fileName, FileMode.Open);
-                import = new Import(HjsonValue.Load(file));
+                try
+                {
+                    import = new Import(HjsonValue.Load(file));
+                }catch
+                {
+
+                }
                 hasReplace = true;
                 orig(mod);
                 try

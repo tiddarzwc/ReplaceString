@@ -55,7 +55,7 @@ namespace ReplaceString
             {
                 val = "\n\t'''\n\t" + Regex.Replace(val, "[\\n\\r]", "\n\t") + "\n\t'''";
             }
-            if (Regex.IsMatch(val, "^(?:{|}|\\[|\\]|:|,|\\\"|')"))
+            if (Regex.IsMatch(val.Trim(), "^(?:{|}|\\[|\\]|:|,|\\\"|')"))
             {
                 val = '\"' + val.Replace("\n", "\\n").Replace("\"", "\\\"") + "\"";
             }
