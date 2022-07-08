@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using _ReplaceString_;
 
 using DebugCommands.Flow.ActionFlows;
 
@@ -7,7 +8,7 @@ using Hjson;
 using Terraria;
 using Terraria.Localization;
 
-namespace ReplaceString.Command
+namespace _ReplaceString_.Command
 {
     internal class ImportAction : ActionFlow
     {
@@ -18,7 +19,7 @@ namespace ReplaceString.Command
             {
                 Directory.CreateDirectory($"{Main.SavePath}/Mods/ReplaceString");
             }
-            if(!File.Exists($"{Main.SavePath}/Mods/ReplaceString/{mod.Name}_{Language.ActiveCulture.Name}.hjson"))
+            if (!File.Exists($"{Main.SavePath}/Mods/ReplaceString/{mod.Name}_{Language.ActiveCulture.Name}.hjson"))
             {
                 ModContent.GetInstance<ReplaceString>().Logger.Warn($"{mod.Name}_{Language.ActiveCulture.Name}.hjson not found, Please check mod name and language");
                 return;

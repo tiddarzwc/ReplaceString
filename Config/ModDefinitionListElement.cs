@@ -6,9 +6,9 @@ using Microsoft.Xna.Framework;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
-using static ReplaceString.Config.Constant;
+using static _ReplaceString_.Config.Constant;
 
-namespace ReplaceString.Config
+namespace _ReplaceString_.Config
 {
     internal class ModDefinitionListElement : ConfigElement<List<ModDefinition>>
     {

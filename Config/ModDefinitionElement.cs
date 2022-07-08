@@ -6,9 +6,9 @@ using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.UI;
-using static ReplaceString.Config.Constant;
+using static _ReplaceString_.Config.Constant;
 
-namespace ReplaceString.Config
+namespace _ReplaceString_.Config
 {
     internal static class Constant
     {
@@ -49,11 +49,11 @@ namespace ReplaceString.Config
                 < 60 => "Loading..",
                 _ => "Loading..."
             });
-            if(timer >= 80)
+            if (timer >= 80)
             {
                 timer = 0;
             }
-            if(!(bool)modsMenu.GetType().GetField("loading", BindingFlags.Public | BindingFlags.Instance).GetValue(modsMenu))
+            if (!(bool)modsMenu.GetType().GetField("loading", BindingFlags.Public | BindingFlags.Instance).GetValue(modsMenu))
             {
                 var modlist = Parent as ModDefinitionListElement;
                 modlist.loading = false;

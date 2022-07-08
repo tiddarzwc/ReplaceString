@@ -1,4 +1,4 @@
-﻿namespace ReplaceString.Command
+﻿namespace _ReplaceString_.Command
 {
     internal class ExportCommand : DebugCommands.Flow.CommandFlows.CommandFlow
     {

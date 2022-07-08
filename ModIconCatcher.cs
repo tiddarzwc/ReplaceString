@@ -8,7 +8,8 @@ using MonoMod.RuntimeDetour;
 using ReLogic.Content;
 using Terraria.GameContent.UI.Elements;
 using System.Reflection;
-namespace ReplaceString;
+
+namespace _ReplaceString_;
 public struct ModInfo
 {
     public static ModInfo Default => new ModInfo(ModContent.Request<Texture2D>("ReplaceString/DeletedMod", AssetRequestMode.ImmediateLoad).Value, false, "Deleted Mod");

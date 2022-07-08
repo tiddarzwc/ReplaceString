@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 
 using DebugCommands.Flow.DataFlows;
 
-namespace ReplaceString.Command
+namespace _ReplaceString_.Command
 {
     internal class ExportConfig : DataFlow
     {

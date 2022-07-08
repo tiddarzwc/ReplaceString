@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using static ReplaceString.Config.Constant;
+using static _ReplaceString_.Config.Constant;
 
-namespace ReplaceString.Config
+namespace _ReplaceString_.Config
 {
     public class ModSelectedElement : UIElement
     {
@@ -30,10 +30,10 @@ namespace ReplaceString.Config
 
         private void ModSelectedElement_OnUpdate(UIElement affectedElement)
         {
-            if(ModList.needUpdate)
+            if (ModList.needUpdate)
             {
                 Elements.Clear();
-                foreach(var (mod, info) in ModList.GetUnAddedMod().OrderBy(mod => mod.Key))
+                foreach (var (mod, info) in ModList.GetUnAddedMod().OrderBy(mod => mod.Key))
                 {
                     var ui = new ModDefinitionElement(new ModDefinition(mod, info.displayName))
                     {

@@ -11,7 +11,7 @@ using MonoMod.RuntimeDetour;
 
 using Terraria.Localization;
 
-namespace ReplaceString
+namespace _ReplaceString_
 {
     internal class Import
     {

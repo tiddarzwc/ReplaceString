@@ -1,10 +1,9 @@
 ﻿using System.Text.RegularExpressions;
-
-using ReplaceString.Command;
+using _ReplaceString_.Command;
 
 using Terraria.Localization;
 
-namespace ReplaceString
+namespace _ReplaceString_
 {
     internal class Leaf : TreeNode
     {

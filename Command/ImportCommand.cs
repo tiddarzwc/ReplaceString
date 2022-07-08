@@ -1,7 +1,6 @@
-﻿
-using DebugCommands.Flow.CommandFlows;
+﻿using DebugCommands.Flow.CommandFlows;
 
-namespace ReplaceString.Command
+namespace _ReplaceString_.Command
 {
     internal class ImportCommand : CommandFlow
     {

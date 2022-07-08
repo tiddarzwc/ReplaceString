@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader.Config;
 
-namespace ReplaceString.Config
+namespace _ReplaceString_.Config
 {
     public class ReplaceStringConfig : ModConfig
     {

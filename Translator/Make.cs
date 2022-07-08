@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ReplaceString.Translator
+namespace _ReplaceString_.Translator
 {
     internal class Make
     {

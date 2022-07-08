@@ -4,18 +4,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using _ReplaceString_.Config;
 using DebugCommands.Flow.DataFlows;
 using Hjson;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
-using ReplaceString.Command;
-using ReplaceString.Config;
+using _ReplaceString_.Command;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader.Core;
 
-namespace ReplaceString
+namespace _ReplaceString_
 {
     public static class Extension
     {

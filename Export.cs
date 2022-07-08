@@ -10,7 +10,7 @@ using Mono.Cecil.Cil;
 using Terraria.Localization;
 using Terraria.ModLoader.Core;
 
-namespace ReplaceString
+namespace _ReplaceString_
 {
 
 

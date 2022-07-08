@@ -3,7 +3,7 @@
 using Terraria;
 using Terraria.Localization;
 
-namespace ReplaceString.Command
+namespace _ReplaceString_.Command
 {
     internal class ExporAction : DebugCommands.Flow.ActionFlows.ActionFlow
     {
@@ -11,7 +11,7 @@ namespace ReplaceString.Command
         {
             var mod = (Mod)((object[])ReplaceString.Command.Call("Arguement"))[0];
             Export export = new Export(mod);
-            if(!Directory.Exists($"{Main.SavePath}/Mods/ReplaceString"))
+            if (!Directory.Exists($"{Main.SavePath}/Mods/ReplaceString"))
             {
                 Directory.CreateDirectory($"{Main.SavePath}/Mods/ReplaceString");
             }
