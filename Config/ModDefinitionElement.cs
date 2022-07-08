@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.UI;
@@ -70,8 +71,9 @@ namespace ReplaceString.Config
             if (!ReplaceString.Catcher.modInfos.TryGetValue(value.Name, out var info))
             {
                 info = ModInfo.Default with { displayName = value.DisplayName };
-                
-                var deleteButton = new UIImageButton(ModContent.Request<Texture2D>("ReplaceString/DeleteButton", ReLogic.Content.AssetRequestMode.ImmediateLoad))
+                var tex = TextureAssets.Trash;
+                tex.Wait();
+                var deleteButton = new UIImageButton(tex)
                 {
                     MarginLeft = Parent.GetDimensions().Width - ICON_SPACE - 32,
                     MarginTop = ICON_SPACE

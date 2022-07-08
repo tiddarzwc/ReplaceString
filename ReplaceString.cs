@@ -6,11 +6,14 @@ using System.Linq;
 using System.Reflection;
 using DebugCommands.Flow.DataFlows;
 using Hjson;
+using Mono.Cecil.Cil;
+using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using ReplaceString.Command;
 using ReplaceString.Config;
 using Terraria;
 using Terraria.Localization;
+using Terraria.ModLoader.Core;
 
 namespace ReplaceString
 {
@@ -206,6 +209,7 @@ namespace ReplaceString
     {
         public static Mod Command;
         public List<Hook> hooks;
+        public List<ILHook> ilHooks;
         public ModCatcher catcher;
         private static ReplaceString instance;
         public static ReplaceString Instance => instance;
@@ -217,36 +221,9 @@ namespace ReplaceString
             MonoModHooks.RequestNativeAccess();
             catcher = new ModCatcher();
             hooks = new List<Hook>();
+            ilHooks = new List<ILHook>();
             Import import = null;
             bool hasReplace = false;
-            hooks.Add(new Hook(typeof(Mod).GetMethod("Autoload", BindingFlags.Instance | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
-            {
-                string fileName = $"{Main.SavePath}/Mods/ReplaceString/{mod.Name}_{Language.ActiveCulture.Name}.hjson";
-                if (!ReplaceStringConfig.Config?.AutoloadModList.Any(d => d.Name == mod.Name) ?? false || !File.Exists(fileName))
-                {
-                    orig(mod);
-                    return;
-                }
-                using var file = new FileStream(fileName, FileMode.Open);
-                try
-                {
-                    import = new Import(HjsonValue.Load(file));
-                }catch
-                {
-
-                }
-                hasReplace = true;
-                orig(mod);
-                try
-                {
-                    hasReplace = false;
-                    import.PostModLoad();
-                }
-                catch (Exception)
-                {
-                    ;
-                }
-            }));
             hooks.Add(new Hook(typeof(LocalizationLoader).GetMethod("Autoload", BindingFlags.Static | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
             {
                 orig(mod);
@@ -262,7 +239,42 @@ namespace ReplaceString
                     }
                 }
             }));
+            
+            ilHooks.Add(new ILHook(typeof(AssemblyManager).GetMethod("Instantiate", BindingFlags.Static | BindingFlags.NonPublic), il =>
+            {
+                var cursor = new ILCursor(il);
+                var type = typeof(AssemblyManager).GetNestedType("ModLoadContext", BindingFlags.NonPublic);
+                cursor.Emit(OpCodes.Ldarg_0);
+                cursor.Emit(OpCodes.Ldfld, type.GetField("assembly"));
+                cursor.Emit(OpCodes.Ldarg_0);
+                cursor.Emit(OpCodes.Callvirt, type.GetProperty("Name", BindingFlags.Public | BindingFlags.Instance).GetMethod);
+                cursor.EmitDelegate((Assembly asm, string name) =>
+                {
+                    string fileName = $"{Main.SavePath}/Mods/ReplaceString/{name}_{Language.ActiveCulture.Name}.hjson";
+                    if (!ReplaceStringConfig.Config?.AutoloadModList.Any(d => d.Name == name) ?? false || !File.Exists(fileName))
+                    {
+                        return;
+                    }
+                    using var file = new FileStream(fileName, FileMode.Open);
+                    try
+                    {
+                        import = new Import(HjsonValue.Load(file));
+                    }
+                    catch
+                    {
 
+                    }
+                    try
+                    {
+                        import.PostModLoad();
+                    }
+                    catch (Exception)
+                    {
+                        ;
+                    }
+                    hasReplace = true;
+                });
+            }));
         }
         public override void Load()
         {
@@ -275,6 +287,10 @@ namespace ReplaceString
         {
             Command = null;
             foreach(var hook in hooks)
+            {
+                hook.Dispose();
+            }
+            foreach(var hook in ilHooks)
             {
                 hook.Dispose();
             }
