@@ -248,7 +248,9 @@ namespace _ReplaceString_
                 cursor.Emit(OpCodes.Ldfld, type.GetField("assembly"));
                 cursor.Emit(OpCodes.Ldarg_0);
                 cursor.Emit(OpCodes.Callvirt, type.GetProperty("Name", BindingFlags.Public | BindingFlags.Instance).GetMethod);
-                cursor.EmitDelegate((Assembly asm, string name) =>
+                cursor.Emit(OpCodes.Ldarg_0);
+                cursor.Emit(OpCodes.Ldfld, type.GetField("modFile"));
+                cursor.EmitDelegate((Assembly asm, string name, TmodFile modFile) =>
                 {
                     Logger.Info(name);
                     string fileName = $"{Main.SavePath}/Mods/ReplaceString/{name}_{Language.ActiveCulture.Name}.hjson";
@@ -267,7 +269,7 @@ namespace _ReplaceString_
                     }
                     try
                     {
-                        import.PostModLoad();
+                        import.PreModLoad(name, asm, modFile);
                     }
                     catch (Exception ex)
                     {
