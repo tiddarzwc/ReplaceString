@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using _ReplaceString_.Command;
 using _ReplaceString_.Config;
+using DebugCommands.Flow;
 using DebugCommands.Flow.DataFlows;
 using Hjson;
 using Mono.Cecil.Cil;
@@ -296,8 +297,11 @@ namespace _ReplaceString_
         public override void Load()
         {
             Command = ModLoader.GetMod("DebugCommands");
-            Command.Call("Add", new ExportCommand() / new FindModFlow() * new ExportConfig() / new ExporAction());
-            Command.Call("Add", new ImportCommand() / new FindModFlow() / new ImportAction());
+
+            MainFlow.Instance.Append(new ExportCommand() / new FindModFlow() * new ExportConfig() / new ExporAction());
+            MainFlow.Instance.Append(new ImportCommand() / new FindModFlow() / new ImportAction());
+            MainFlow.Instance.Append(new MakeCommand() / new FindHjson() * new TargetCulture() / new MakeAction());
+            MainFlow.Instance.Append(new PackCommand() / new FindDirectory() / new PackAction());
         }
 
         public override void Unload()

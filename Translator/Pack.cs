@@ -7,7 +7,7 @@ namespace _ReplaceString_.Translator
     internal static class Pack
     {
         public static MakeConfig config;
-        public static TreeNode Packup(string path)
+        public static (TreeNode root, MakeConfig config) Packup(string path)
         {
             FileStream file;
             StreamReader reader;
@@ -18,10 +18,11 @@ namespace _ReplaceString_.Translator
 
             TreeNode root = new TreeNode(config.ModName);
             string line;
-            string key = null, value = null;
             bool begin;
             var item = root["ItemName"];
             var tooltip = root["ItemTooltip"];
+            string key;
+            string value;
             using (file = new FileStream($"{path}/Item.txt", FileMode.Open))
             {
                 using (reader = new StreamReader(file))
@@ -401,7 +402,7 @@ namespace _ReplaceString_.Translator
             }
 
 
-            return root;
+            return (root, config);
         }
 
         private static void PackupLdstr(string path, TreeNode node)

@@ -181,7 +181,7 @@ namespace _ReplaceString_
                     {
                         foreach (var p in method.GetParameters())
                         {
-                            methodName += '_' + p.ParameterType.Name;
+                            methodName += '_' + p.ParameterType.Name.Replace("[]", "s");
                         }
                     }
                     methods.Add($"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);

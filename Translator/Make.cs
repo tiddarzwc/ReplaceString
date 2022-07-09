@@ -13,7 +13,7 @@ namespace _ReplaceString_.Translator
         public static string SetupFolds(TreeNode root, MakeConfig config)
         {
             Make.config = config;
-            string path = $"{Main.SavePath}/Mods/ReplaceString/{config.ModName}-{DateTime.Today.ToString().Split(' ')[0].Replace('/', '-')}";
+            string path = $"{Main.SavePath}/Mods/ReplaceString/{config.ModName}-{ModLoader.GetMod(root.name).Version.ToString().Replace(".", "")}";
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

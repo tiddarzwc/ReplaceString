@@ -17,10 +17,6 @@ namespace _ReplaceString_.Command
             }
             using FileStream file = new FileStream($"{Main.SavePath}/Mods/ReplaceString/{mod.Name}_{Language.ActiveCulture.Name}.hjson", FileMode.Create);
             export.Hjson(file);
-
-
-            var t = Pack.Packup(Make.SetupFolds(export.head, new MakeConfig(mod.Name, Language.ActiveCulture.LegacyId, true, true)));
-            File.WriteAllText("Temp.hjson", t.BuildHjson(0).ToString());
         }
     }
 }

@@ -102,7 +102,7 @@ namespace _ReplaceString_
                                     {
                                         foreach (var p in method.Parameters)
                                         {
-                                            methodName += '_' + p.ParameterType.Name;
+                                            methodName += '_' + p.ParameterType.Name.Replace("[]", "s");
                                         }
                                     }
                                     string[] key = $"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_").Split('.');
