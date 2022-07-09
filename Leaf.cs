@@ -1,8 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using _ReplaceString_.Command;
 
-using Terraria.Localization;
-
 namespace _ReplaceString_
 {
     internal class Leaf : TreeNode
@@ -54,11 +52,29 @@ namespace _ReplaceString_
             {
                 val = "\n\t'''\n\t" + Regex.Replace(val, "[\\n\\r]", "\n\t") + "\n\t'''";
             }
-            if (Regex.IsMatch(val.Trim(), "^(?:{|}|\\[|\\]|:|,|\\\"|')"))
+            else if (Regex.IsMatch(val.Trim(), "^(?:{|}|\\[|\\]|:|,|\\\"|')"))
             {
                 val = '\"' + val.Replace("\n", "\\n").Replace("\"", "\\\"") + "\"";
             }
             return $"{className}{ExportConfig.Space}:{ExportConfig.Space}{val}";
+        }
+        public string GetValue(string space, bool ignoreEmpty)
+        {
+            string className = $"{name.Split('.')[^1]}";
+            string val = value;
+            if (string.IsNullOrEmpty(val))
+            {
+                val = ignoreEmpty ? val : EmptyString;
+            }
+            else if (name == value)
+            {
+                val = className;
+            }
+            else if (Regex.IsMatch(val, "[\\n\\r]"))
+            {
+                val = "\n" + space + "\t" + Regex.Replace(val, "[\\n\\r]", "\n" + space + "\t");
+            }
+            return val;
         }
         public override bool Equals(TreeNode other)
         {

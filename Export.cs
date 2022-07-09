@@ -96,7 +96,7 @@ namespace _ReplaceString_
                             switch (IsValid(instr))
                             {
                                 case CheckResult.True:
-                                    string[] key = $"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<>", "").Replace("`", "_").Split('.');
+                                    string[] key = $"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_").Split('.');
                                     if (key.Length > 0)
                                     {
                                         for (int i = 0; i < key.Length; i++)
@@ -110,7 +110,7 @@ namespace _ReplaceString_
                                 case CheckResult.False:
                                     break;
                                 case CheckResult.Path:
-                                    path += new Leaf($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}_{pathCount++}".Replace("<>", "").Replace("`", "_"), instr.Operand.ToString());
+                                    path += new Leaf($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}_{pathCount++}".Replace("<", "").Replace(">", "").Replace("`", "_"), instr.Operand.ToString());
                                     break;
                                 default:
                                     break;

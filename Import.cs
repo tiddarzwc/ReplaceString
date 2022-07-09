@@ -175,13 +175,13 @@ namespace _ReplaceString_
             {
                 foreach (var method in type.DeclaredMethods)
                 {
-                    methods.Add($"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<>", "").Replace("`", "_"), method);
-                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<>", "").Replace("`", "_"), method);
+                    methods.Add($"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
                 }
                 foreach (var method in type.DeclaredConstructors)
                 {
-                    methods.Add($"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<>", "").Replace("`", "_"), method);
-                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<>", "").Replace("`", "_"), method);
+                    methods.Add($"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
                 }
             }
             var oldstr = export.head["Ldstr"];
