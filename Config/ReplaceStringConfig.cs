@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader.Config;
@@ -10,14 +11,8 @@ namespace _ReplaceString_.Config
     {
         [Label("Autoload Mods")]
         [CustomModConfigItem(typeof(ModDefinitionListElement))]
-        public List<ModDefinition> AutoloadModList = new List<ModDefinition>();
+        public List<ModDefinition> AutoloadModList { get; set; } = new List<ModDefinition>();
         public override ConfigScope Mode => ConfigScope.ClientSide;
-        public static ReplaceStringConfig Config { get; private set; }
-
-        public override void OnLoaded()
-        {
-            Config = this;
-        }
         public override void OnChanged()
         {
             //var modList = ModLoader.Mods.Select(mod => mod.Name);

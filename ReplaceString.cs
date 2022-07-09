@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using _ReplaceString_.Command;
 using _ReplaceString_.Config;
 using DebugCommands.Flow.DataFlows;
 using Hjson;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
-using _ReplaceString_.Command;
+using Newtonsoft.Json;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader.Core;
@@ -240,6 +241,17 @@ namespace _ReplaceString_
                 }
             }));
 
+            ReplaceStringConfig config = new ReplaceStringConfig();
+            try
+            {
+                string path = $"{Main.SavePath}/ModConfigs/_ReplaceString__ReplaceStringConfig.json";
+                string json = File.Exists(path) ? File.ReadAllText(path) : "{}";
+                JsonConvert.PopulateObject(json, config);
+            }
+            catch (Exception)
+            {
+                ;
+            }
             ilHooks.Add(new ILHook(typeof(AssemblyManager).GetMethod("Instantiate", BindingFlags.Static | BindingFlags.NonPublic), il =>
             {
                 var cursor = new ILCursor(il);
@@ -252,9 +264,8 @@ namespace _ReplaceString_
                 cursor.Emit(OpCodes.Ldfld, type.GetField("modFile"));
                 cursor.EmitDelegate((Assembly asm, string name, TmodFile modFile) =>
                 {
-                    Logger.Info(name);
                     string fileName = $"{Main.SavePath}/Mods/ReplaceString/{name}_{Language.ActiveCulture.Name}.hjson";
-                    if (!ReplaceStringConfig.Config?.AutoloadModList.Any(d => d.Name == name) ?? false || !File.Exists(fileName))
+                    if (!(config?.AutoloadModList.Any(d => d.Name == name) ?? false) || !File.Exists(fileName))
                     {
                         return;
                     }
@@ -269,7 +280,10 @@ namespace _ReplaceString_
                     }
                     try
                     {
-                        import.PreModLoad(name, asm, modFile);
+                        using (modFile.Open())
+                        {
+                            import.PreModLoad(name, asm, modFile.GetModAssembly());
+                        }
                     }
                     catch (Exception ex)
                     {

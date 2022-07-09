@@ -77,11 +77,11 @@ namespace _ReplaceString_
             BuildDuplicate();
             GetLdstr();
         }
-        public static void GetLdstr(TreeNode root, TmodFile file, HashSet<string> duplicate)
+        public static void GetLdstr(TreeNode root, string name, byte[] asmBytes, HashSet<string> duplicate)
         {
             var ldstr = new TreeNode("Ldstr");
             var path = new TreeNode("Path");
-            var asm = AssemblyDefinition.ReadAssembly(new MemoryStream(file.GetModAssembly()));
+            var asm = AssemblyDefinition.ReadAssembly(new MemoryStream(asmBytes));
             var module = asm.MainModule;
             TreeNode current = ldstr;
             foreach (var type in module.Types)
@@ -94,10 +94,18 @@ namespace _ReplaceString_
                     {
                         if (instr.OpCode == OpCodes.Ldstr)
                         {
-                            switch (IsValid(instr, file.Name, duplicate))
+                            switch (IsValid(instr, name, duplicate))
                             {
                                 case CheckResult.True:
-                                    string[] key = $"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_").Split('.');
+                                    string methodName = method.Name.Replace("get_", "").Replace(".", "");
+                                    if (!method.IsSpecialName)
+                                    {
+                                        foreach (var p in method.Parameters)
+                                        {
+                                            methodName += '_' + p.ParameterType.Name;
+                                        }
+                                    }
+                                    string[] key = $"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_").Split('.');
                                     if (key.Length > 0)
                                     {
                                         for (int i = 0; i < key.Length; i++)
@@ -126,7 +134,7 @@ namespace _ReplaceString_
         }
         public void GetLdstr()
         {
-            GetLdstr(head, mod.GetValue<TmodFile>("File"), duplicate);
+            GetLdstr(head, mod.Name, mod.GetValue<TmodFile>("File").GetModAssembly(), duplicate);
         }
         public void GetMapEntry()
         {

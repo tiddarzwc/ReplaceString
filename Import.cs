@@ -10,7 +10,6 @@ using Mono.Cecil.Cil;
 using MonoMod.RuntimeDetour;
 
 using Terraria.Localization;
-using Terraria.ModLoader.Core;
 
 namespace _ReplaceString_
 {
@@ -52,11 +51,10 @@ namespace _ReplaceString_
             AddLdstrAndPath();
             LocalizationLoader.RefreshModLanguage(Language.ActiveCulture);
         }
-        public void PreModLoad(string name, Assembly assembly, TmodFile modFile)
+        public void PreModLoad(string name, Assembly assembly, byte[] asmBytes)
         {
             this.name = name;
             this.assembly = assembly;
-            MonoModHooks.RequestNativeAccess();
             if (hookList.ContainsKey(name))
             {
                 foreach (var hook in hookList[name])
@@ -70,7 +68,7 @@ namespace _ReplaceString_
                 hookList.Add(name, new List<ILHook>());
             }
             oldTree = new TreeNode(name);
-            Export.GetLdstr(oldTree, modFile, new HashSet<string>());
+            Export.GetLdstr(oldTree, name, asmBytes, new HashSet<string>());
             AddMapEntry(Language.ActiveCulture);
             AddLdstrAndPath();
         }
@@ -178,13 +176,29 @@ namespace _ReplaceString_
             {
                 foreach (var method in type.DeclaredMethods)
                 {
-                    methods.Add($"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
-                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    string methodName = method.Name.Replace("get_", "").Replace(".", "");
+                    if (!method.IsSpecialName)
+                    {
+                        foreach (var p in method.GetParameters())
+                        {
+                            methodName += '_' + p.ParameterType.Name;
+                        }
+                    }
+                    methods.Add($"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
                 }
                 foreach (var method in type.DeclaredConstructors)
                 {
-                    methods.Add($"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
-                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    string methodName = method.Name.Replace("get_", "").Replace(".", "");
+                    if (!method.IsSpecialName)
+                    {
+                        foreach (var p in method.GetParameters())
+                        {
+                            methodName += '_' + p.Name;
+                        }
+                    }
+                    methods.Add($"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
                 }
             }
             var oldstr = oldTree["Ldstr"];
@@ -201,8 +215,6 @@ namespace _ReplaceString_
             if (current.children.First() is Leaf)
             {
                 //Replace部分
-                //var newStrings = current.children.Select(t => t as Leaf).GetEnumerator();
-                //var oldStrings = old.children.Select(t => t as Leaf).GetEnumerator();
                 var strs = from n in
                                from l in current.children select l as Leaf
                            join o in
@@ -228,6 +240,10 @@ namespace _ReplaceString_
                             if (ins.OpCode == OpCodes.Ldstr && ins.Operand.ToString() == replace.Peek().oldString)
                             {
                                 ins.Operand = replace.Dequeue().newString;
+                                if(replace.Count == 0)
+                                {
+                                    break;
+                                }
                             }
                         }
                     }, ref config));
@@ -235,15 +251,16 @@ namespace _ReplaceString_
             }
             else
             {
-                foreach (var pair in current.children.Join(old.children, n => n.name, n => n.name, (n1, n2) => (n1, n2)))
+                var it = current.children.Join(old.children, n => n.name, n => n.name, (n1, n2) => (n1, n2));
+                foreach (var (n1, n2) in it)
                 {
                     if (string.IsNullOrEmpty(fullname))
                     {
-                        AddLdstr(pair.n1, pair.n2, $"{current.name}");
+                        AddLdstr(n1, n2, $"{current.name}");
                     }
                     else
                     {
-                        AddLdstr(pair.n1, pair.n2, $"{fullname}.{current.name}");
+                        AddLdstr(n1, n2, $"{fullname}.{current.name}");
                     }
                 }
             }
