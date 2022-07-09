@@ -46,7 +46,7 @@ namespace _ReplaceString_.Command
             object[] args = MainFlow.Arguments.ToArray();
             var path = $"{Main.SavePath}/Mods/ReplaceString/{args[0]}";
             var (treeNode, config) = Pack.Packup(path);
-            File.WriteAllText($"{Main.SavePath}/Mods/ReplaceString/{treeNode.name}_{GameCulture.FromCultureName((GameCulture.CultureName)config.TargetCultureID).Name}_packed.hjson", treeNode.BuildHjson(0).ToString());
+            File.WriteAllText($"{Main.SavePath}/Mods/ReplaceString/{treeNode.name}-{GameCulture.FromCultureName((GameCulture.CultureName)config.TargetCultureID).Name}-packed.hjson", treeNode.BuildHjson(0).ToString());
         }
     }
 }

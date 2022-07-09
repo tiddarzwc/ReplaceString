@@ -176,12 +176,12 @@ namespace _ReplaceString_
             {
                 foreach (var method in type.DeclaredMethods)
                 {
-                    string methodName = method.Name.Replace("get_", "").Replace(".", "");
-                    if (!method.IsSpecialName)
+                    string methodName = method.Name.Replace("get_", "").Replace(".", "").Replace("|", "");
+                    if (type.DeclaredMethods.Count(m => m.Name == method.Name) > 1)
                     {
                         foreach (var p in method.GetParameters())
                         {
-                            methodName += '_' + p.ParameterType.Name.Replace("[]", "s");
+                            methodName += '_' + p.ParameterType.Name.Replace("[", "").Replace(",", "").Replace("]", "s").Replace("&", "Ref");
                         }
                     }
                     methods.Add($"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
@@ -189,12 +189,12 @@ namespace _ReplaceString_
                 }
                 foreach (var method in type.DeclaredConstructors)
                 {
-                    string methodName = method.Name.Replace("get_", "").Replace(".", "");
-                    if (!method.IsSpecialName)
+                    string methodName = method.Name.Replace("get_", "").Replace(".", "").Replace("|", "");
+                    if (type.DeclaredMethods.Count(m => m.Name == method.Name) > 1)
                     {
                         foreach (var p in method.GetParameters())
                         {
-                            methodName += '_' + p.Name;
+                            methodName += '_' + p.ParameterType.Name.Replace("[", "").Replace(",", "").Replace("]", "s").Replace("&", "Ref");
                         }
                     }
                     methods.Add($"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);

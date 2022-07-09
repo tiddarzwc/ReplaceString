@@ -21,10 +21,10 @@ namespace _ReplaceString_.Command
             }
             if (!File.Exists($"{Main.SavePath}/Mods/ReplaceString/{mod.Name}_{Language.ActiveCulture.Name}.hjson"))
             {
-                ModContent.GetInstance<ReplaceString>().Logger.Warn($"{mod.Name}_{Language.ActiveCulture.Name}.hjson not found, Please check mod name and language");
+                ModContent.GetInstance<ReplaceString>().Logger.Warn($"{mod.Name}-{Language.ActiveCulture.Name}.hjson not found, Please check mod name and language");
                 return;
             }
-            using FileStream file = new FileStream($"{Main.SavePath}/Mods/ReplaceString/{mod.Name}_{Language.ActiveCulture.Name}.hjson", FileMode.Open);
+            using FileStream file = new FileStream($"{Main.SavePath}/Mods/ReplaceString/{mod.Name}-{Language.ActiveCulture.Name}.hjson", FileMode.Open);
             new Import(HjsonValue.Load(file)).Load();
         }
     }

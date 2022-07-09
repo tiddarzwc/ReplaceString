@@ -97,12 +97,12 @@ namespace _ReplaceString_
                             switch (IsValid(instr, name, duplicate))
                             {
                                 case CheckResult.True:
-                                    string methodName = method.Name.Replace("get_", "").Replace(".", "");
-                                    if (!method.IsSpecialName)
+                                    string methodName = method.Name.Replace("get_", "").Replace(".", "").Replace("|", "");
+                                    if (type.Methods.Count(m => m.Name == method.Name) > 1)
                                     {
                                         foreach (var p in method.Parameters)
                                         {
-                                            methodName += '_' + p.ParameterType.Name.Replace("[]", "s");
+                                            methodName += '_' + p.ParameterType.Name.Replace("[", "").Replace(",", "").Replace("]", "s").Replace("&", "Ref");
                                         }
                                     }
                                     string[] key = $"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_").Split('.');

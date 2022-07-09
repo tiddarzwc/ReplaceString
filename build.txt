@@ -1,4 +1,4 @@
 displayName = Replace String
-author = ye_you
+author = р╧╧хвосд(ye_you)
 version = 0.1
 modReferences = DebugCommands
