@@ -416,7 +416,7 @@ namespace _ReplaceString_.Translator
             foreach(var f in file)
             {
                 bool begin;
-                var child = node[Path.ChangeExtension(f.Split('\\')[^1], "")];
+                var child = node[Path.GetFileNameWithoutExtension(f.Split('\\')[^1])];
                 string key, line, value;
                 using var reader = File.OpenText(f);
                 while ((line = reader.ReadLine()) != null)
