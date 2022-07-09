@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 using Mono.Cecil;
@@ -76,11 +77,11 @@ namespace _ReplaceString_
             BuildDuplicate();
             GetLdstr();
         }
-        public void GetLdstr()
+        public static void GetLdstr(TreeNode root, string name, byte[] asmBytes, HashSet<string> duplicate)
         {
             var ldstr = new TreeNode("Ldstr");
             var path = new TreeNode("Path");
-            var asm = AssemblyDefinition.ReadAssembly(new MemoryStream(mod.GetValue<TmodFile>("File").GetModAssembly()));
+            var asm = AssemblyDefinition.ReadAssembly(new MemoryStream(asmBytes));
             var module = asm.MainModule;
             TreeNode current = ldstr;
             foreach (var type in module.Types)
@@ -93,10 +94,18 @@ namespace _ReplaceString_
                     {
                         if (instr.OpCode == OpCodes.Ldstr)
                         {
-                            switch (IsValid(instr))
+                            switch (IsValid(instr, name, duplicate))
                             {
                                 case CheckResult.True:
-                                    string[] key = $"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_").Split('.');
+                                    string methodName = method.Name.Replace("get_", "").Replace(".", "");
+                                    if (!method.IsSpecialName)
+                                    {
+                                        foreach (var p in method.Parameters)
+                                        {
+                                            methodName += '_' + p.ParameterType.Name;
+                                        }
+                                    }
+                                    string[] key = $"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_").Split('.');
                                     if (key.Length > 0)
                                     {
                                         for (int i = 0; i < key.Length; i++)
@@ -120,9 +129,12 @@ namespace _ReplaceString_
                     }
                 }
             }
-            head += ldstr;
-            head += path;
-
+            root += ldstr;
+            root += path;
+        }
+        public void GetLdstr()
+        {
+            GetLdstr(head, mod.Name, mod.GetValue<TmodFile>("File").GetModAssembly(), duplicate);
         }
         public void GetMapEntry()
         {
@@ -193,7 +205,7 @@ namespace _ReplaceString_
                 }
             }
         }
-        public CheckResult IsValid(Instruction ins)
+        public static CheckResult IsValid(Instruction ins, string modName, HashSet<string> duplicate)
         {
             string operand = ins.Operand.ToString();
             if (operand.Trim('\t', ' ') == string.Empty)
@@ -217,7 +229,7 @@ namespace _ReplaceString_
             if (!operand.Contains('\n'))
             {
                 int count = operand.Count(ch => ch == '/' || ch == '\\');
-                if (count > 0 && (ModLoader.Mods.Any(mod => operand.StartsWith(mod.Name)) || operand.StartsWith("Terraria")))
+                if (count > 0 && (ModLoader.Mods.Any(mod => operand.StartsWith(modName)) || operand.StartsWith("Terraria")))
                 {
                     return CheckResult.Path;
                 }

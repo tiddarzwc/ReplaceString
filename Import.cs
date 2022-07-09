@@ -15,59 +15,60 @@ namespace _ReplaceString_
 {
     internal class Import
     {
-        public Mod mod;
-        public TreeNode head;
-        public Export export;
-        public static readonly Dictionary<Mod, List<ILHook>> hookList = new Dictionary<Mod, List<ILHook>>();
+        public string name;
+        public Assembly assembly;
+        public TreeNode root;
+        public TreeNode oldTree;
+        public static readonly Dictionary<string, List<ILHook>> hookList = new Dictionary<string, List<ILHook>>();
         public Import(JsonValue json)
         {
-            head = TreeNode.ReadHjson(json);
+            root = TreeNode.ReadHjson(json);
         }
         public void Load()
         {
-            if (!ModLoader.TryGetMod(head.name, out mod))
+            if (!ModLoader.TryGetMod(root.name, out var mod))
             {
                 throw new Exception("Mod Not Found");
             }
+            name = mod.Name;
+            assembly = mod.Code;
             MonoModHooks.RequestNativeAccess();
-            if (hookList.ContainsKey(mod))
+            if (hookList.ContainsKey(name))
             {
-                foreach (var hook in hookList[mod])
+                foreach (var hook in hookList[name])
                 {
                     hook.Dispose();
                 }
-                hookList[mod].Clear();
+                hookList[name].Clear();
             }
             else
             {
-                hookList.Add(mod, new List<ILHook>());
+                hookList.Add(name, new List<ILHook>());
             }
-            export = new Export(mod);
+            oldTree = new Export(mod).head;
             AddTranslation(Language.ActiveCulture);
             AddMapEntry(Language.ActiveCulture);
             AddLdstrAndPath();
             LocalizationLoader.RefreshModLanguage(Language.ActiveCulture);
         }
-        public void PreModLoad()
+        public void PreModLoad(string name, Assembly assembly, byte[] asmBytes)
         {
-            if (!ModLoader.TryGetMod(head.name, out mod))
+            this.name = name;
+            this.assembly = assembly;
+            if (hookList.ContainsKey(name))
             {
-                throw new Exception("Mod Not Found");
-            }
-            MonoModHooks.RequestNativeAccess();
-            if (hookList.ContainsKey(mod))
-            {
-                foreach (var hook in hookList[mod])
+                foreach (var hook in hookList[name])
                 {
                     hook.Undo();
                 }
-                hookList[mod].Clear();
+                hookList[name].Clear();
             }
             else
             {
-                hookList.Add(mod, new List<ILHook>());
+                hookList.Add(name, new List<ILHook>());
             }
-            export = new Export(mod);
+            oldTree = new TreeNode(name);
+            Export.GetLdstr(oldTree, name, asmBytes, new HashSet<string>());
             AddMapEntry(Language.ActiveCulture);
             AddLdstrAndPath();
         }
@@ -77,45 +78,45 @@ namespace _ReplaceString_
         }
         public void AddTranslation(GameCulture culture)
         {
-            foreach (var t in ModContent.GetContent<IModType>().Where(m => m.Mod == mod))
+            foreach (var t in ModContent.GetContent<IModType>().Where(m => m.Mod.Name == name))
             {
                 if (t is ModItem modItem)
                 {
-                    modItem.DisplayName.AddTranslation(culture, (head["ItemName"][t.Name] as Leaf).value);
-                    modItem.Tooltip.AddTranslation(culture, (head["ItemTooltip"][t.Name] as Leaf).value);
+                    modItem.DisplayName.AddTranslation(culture, (root["ItemName"][t.Name] as Leaf).value);
+                    modItem.Tooltip.AddTranslation(culture, (root["ItemTooltip"][t.Name] as Leaf).value);
                 }
                 else if (t is ModProjectile modProj)
                 {
-                    modProj.DisplayName.AddTranslation(culture, (head["ProjectileName"][modProj.Name] as Leaf).value);
+                    modProj.DisplayName.AddTranslation(culture, (root["ProjectileName"][modProj.Name] as Leaf).value);
                 }
                 else if (t is DamageClass damage)
                 {
-                    damage.ClassName.AddTranslation(culture, (head["DamageClassName"][damage.Name] as Leaf).value);
+                    damage.ClassName.AddTranslation(culture, (root["DamageClassName"][damage.Name] as Leaf).value);
                 }
                 else if (t is InfoDisplay info)
                 {
-                    info.InfoName.AddTranslation(culture, (head["InfoDisplayName"][info.Name] as Leaf).value);
+                    info.InfoName.AddTranslation(culture, (root["InfoDisplayName"][info.Name] as Leaf).value);
                 }
                 else if (t is ModBiome modBiome)
                 {
-                    modBiome.DisplayName.AddTranslation(culture, (head["BiomeName"][modBiome.Name] as Leaf).value);
+                    modBiome.DisplayName.AddTranslation(culture, (root["BiomeName"][modBiome.Name] as Leaf).value);
                 }
                 else if (t is ModBuff modBuff)
                 {
-                    modBuff.DisplayName.AddTranslation(culture, (head["BuffName"][modBuff.Name] as Leaf).value);
-                    modBuff.Description.AddTranslation(culture, (head["BuffDescription"][modBuff.Name] as Leaf).value);
+                    modBuff.DisplayName.AddTranslation(culture, (root["BuffName"][modBuff.Name] as Leaf).value);
+                    modBuff.Description.AddTranslation(culture, (root["BuffDescription"][modBuff.Name] as Leaf).value);
                 }
                 else if (t is ModNPC modNPC)
                 {
-                    modNPC.DisplayName.AddTranslation(culture, (head["NPCName"][modNPC.Name] as Leaf).value);
+                    modNPC.DisplayName.AddTranslation(culture, (root["NPCName"][modNPC.Name] as Leaf).value);
                 }
                 else if (t is ModPrefix modPrefix)
                 {
-                    modPrefix.DisplayName.AddTranslation(culture, (head["Prefix"][modPrefix.Name] as Leaf).value);
+                    modPrefix.DisplayName.AddTranslation(culture, (root["Prefix"][modPrefix.Name] as Leaf).value);
                 }
                 else if (t is ModTile modTile)
                 {
-                    modTile.ContainerName.AddTranslation(culture, (head["Containers"][modTile.Name] as Leaf).value);
+                    modTile.ContainerName.AddTranslation(culture, (root["Containers"][modTile.Name] as Leaf).value);
                 }
             }
         }
@@ -125,7 +126,7 @@ namespace _ReplaceString_
             string[] names = new string[] { "tileEntries", "wallEntries" };
             foreach (var name in names)
             {
-                var node = head[name];
+                var node = root[name];
                 var tileEntries = typeof(ModLoader).Assembly.DefinedTypes.First(t => t?.Name == "MapLoader").AsType().GetValue(name);
                 var it = tileEntries.Invoke("GetEnumerator");
                 while ((bool)it.Invoke("MoveNext"))
@@ -134,7 +135,7 @@ namespace _ReplaceString_
                     ushort type = (ushort)current.GetValue("Key");
                     object entries = current.GetValue("Value");
                     ModTile tile = TileLoader.GetTile(type);
-                    if (tile?.Mod != mod)
+                    if (tile?.Mod?.Name != name)
                     {
                         continue;
                     }
@@ -148,11 +149,11 @@ namespace _ReplaceString_
                         {
                             if (count++ == 0)
                             {
-                                trans.AddTranslation(culture, (head[tile.Name] as Leaf).value);
+                                trans.AddTranslation(culture, (root[tile.Name] as Leaf).value);
                             }
                             else
                             {
-                                trans.AddTranslation(culture, (head[$"{tile.Name}_{count}"] as Leaf).value);
+                                trans.AddTranslation(culture, (root[$"{tile.Name}_{count}"] as Leaf).value);
                             }
                         }
                     }
@@ -169,23 +170,39 @@ namespace _ReplaceString_
         };
         public void AddLdstrAndPath()
         {
-            var ldstr = head["Ldstr"];
-            var path = head["Path"];
-            foreach (var type in mod.Code.DefinedTypes)
+            var ldstr = root["Ldstr"];
+            var path = root["Path"];
+            foreach (var type in assembly.DefinedTypes)
             {
                 foreach (var method in type.DeclaredMethods)
                 {
-                    methods.Add($"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
-                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    string methodName = method.Name.Replace("get_", "").Replace(".", "");
+                    if (!method.IsSpecialName)
+                    {
+                        foreach (var p in method.GetParameters())
+                        {
+                            methodName += '_' + p.ParameterType.Name;
+                        }
+                    }
+                    methods.Add($"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
                 }
                 foreach (var method in type.DeclaredConstructors)
                 {
-                    methods.Add($"{type.FullName}.{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
-                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    string methodName = method.Name.Replace("get_", "").Replace(".", "");
+                    if (!method.IsSpecialName)
+                    {
+                        foreach (var p in method.GetParameters())
+                        {
+                            methodName += '_' + p.Name;
+                        }
+                    }
+                    methods.Add($"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
                 }
             }
-            var oldstr = export.head["Ldstr"];
-            var oldpath = export.head["Path"];
+            var oldstr = oldTree["Ldstr"];
+            var oldpath = oldTree["Path"];
             for (int i = 0; i < ldstr.children.Count; i++)
             {
                 AddLdstr(ldstr.children[i], oldstr.children[i], string.Empty);
@@ -198,8 +215,6 @@ namespace _ReplaceString_
             if (current.children.First() is Leaf)
             {
                 //Replace部分
-                //var newStrings = current.children.Select(t => t as Leaf).GetEnumerator();
-                //var oldStrings = old.children.Select(t => t as Leaf).GetEnumerator();
                 var strs = from n in
                                from l in current.children select l as Leaf
                            join o in
@@ -218,13 +233,17 @@ namespace _ReplaceString_
                 if (replace.Count > 0)
                 {
                     var method = methods[$"{fullname}.{current.name}"];
-                    hookList[mod].Add(new ILHook(method, il =>
+                    hookList[name].Add(new ILHook(method, il =>
                     {
                         foreach (var ins in il.Instrs)
                         {
                             if (ins.OpCode == OpCodes.Ldstr && ins.Operand.ToString() == replace.Peek().oldString)
                             {
                                 ins.Operand = replace.Dequeue().newString;
+                                if(replace.Count == 0)
+                                {
+                                    break;
+                                }
                             }
                         }
                     }, ref config));
@@ -232,15 +251,16 @@ namespace _ReplaceString_
             }
             else
             {
-                foreach (var pair in current.children.Join(old.children, n => n.name, n => n.name, (n1, n2) => (n1, n2)))
+                var it = current.children.Join(old.children, n => n.name, n => n.name, (n1, n2) => (n1, n2));
+                foreach (var (n1, n2) in it)
                 {
                     if (string.IsNullOrEmpty(fullname))
                     {
-                        AddLdstr(pair.n1, pair.n2, $"{current.name}");
+                        AddLdstr(n1, n2, $"{current.name}");
                     }
                     else
                     {
-                        AddLdstr(pair.n1, pair.n2, $"{fullname}.{current.name}");
+                        AddLdstr(n1, n2, $"{fullname}.{current.name}");
                     }
                 }
             }
@@ -280,7 +300,7 @@ namespace _ReplaceString_
             while (replacedMethod.Count > 0)
             {
                 method = replacedMethod.Dequeue();
-                hookList[mod].Add(new ILHook(method, il =>
+                hookList[name].Add(new ILHook(method, il =>
                 {
                     foreach (var ins in il.Instrs)
                     {
