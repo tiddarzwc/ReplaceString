@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using _ReplaceString_.Command;
+using _ReplaceString_.Translator.UI;
 using Hjson;
 
 using Terraria.Localization;
@@ -88,7 +89,7 @@ namespace _ReplaceString_
                 sb.AppendLine(tab + name + ExportConfig.Space + ':' + ExportConfig.Space + '{');
                 foreach (var child in children)
                 {
-                    if (ExportConfig.tight)
+                    if (ExportConfig.Tight)
                     {
                         sb.AppendLine(child.BuildHjson(depth + 1).ToString());
                     }

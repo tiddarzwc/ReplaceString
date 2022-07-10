@@ -1,7 +1,9 @@
 ﻿using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria.Audio;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.UI;
 using Terraria.UI.Chat;
 using static _ReplaceString_.Config.Constant;
@@ -43,6 +45,15 @@ namespace _ReplaceString_.Config
                     };
                     Append(ui);
                     ui.Activate();
+                    ui.OnClick += (evt, listeningElement) =>
+                    {
+                        SoundEngine.PlaySound(SoundID.MenuTick);
+                        var modlist = Parent as ModDefinitionListElement;
+                        RemoveChild(this);
+                        modlist.ModList.Add(ui.value);
+                        modlist.OnChange();
+                        modlist.uiFilter.SetText("");
+                    };
                 }
                 ModList.needUpdate = false;
             }

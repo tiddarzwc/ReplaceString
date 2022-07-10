@@ -8,11 +8,14 @@ using MonoMod.RuntimeDetour;
 using ReLogic.Content;
 using Terraria.GameContent.UI.Elements;
 using System.Reflection;
+using System.Threading.Tasks;
+using Terraria.UI;
+using System.Threading;
 
 namespace _ReplaceString_;
 public struct ModInfo
 {
-    public static ModInfo Default => new ModInfo(ModContent.Request<Texture2D>("ReplaceString/DeletedMod", AssetRequestMode.ImmediateLoad).Value, false, "Deleted Mod");
+    public static ModInfo Default => new ModInfo(ModContent.Request<Texture2D>("_ReplaceString_/DeletedMod", AssetRequestMode.ImmediateLoad).Value, false, "Deleted Mod");
     public Texture2D icon;
     public bool enable;
     public string displayName;
@@ -62,5 +65,20 @@ public class ModCatcher : IDisposable
     {
         hook.Dispose();
         hook = null;
+    }
+
+    public static Task ForceLoadIcon()
+    {
+        return Task.Run(() =>
+        {
+            var modsMenu = (UIElement)typeof(ModContent).Assembly.DefinedTypes.First(t => t.Name == "Interface")
+                .GetField("modsMenu", BindingFlags.Static | BindingFlags.NonPublic)
+                .GetValue(null);
+            modsMenu.GetType().GetField("_cts", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(modsMenu, new CancellationTokenSource());
+            var info = modsMenu.GetType().GetField("loading", BindingFlags.Instance | BindingFlags.Public);
+            info.SetValue(modsMenu, true);
+            modsMenu.GetType().GetMethod("Populate", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(modsMenu, null);
+            while ((bool)info.GetValue(modsMenu)) { }
+        });
     }
 }

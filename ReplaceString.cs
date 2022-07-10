@@ -298,7 +298,7 @@ namespace _ReplaceString_
         {
             Command = ModLoader.GetMod("DebugCommands");
 
-            MainFlow.Instance.Append(new ExportCommand() / new FindModFlow() * new ExportConfig() / new ExporAction());
+            MainFlow.Instance.Append(new ExportCommand() / new FindModFlow() / new ExporAction());
             MainFlow.Instance.Append(new ImportCommand() / new FindModFlow() / new ImportAction());
             MainFlow.Instance.Append(new MakeCommand() / new FindHjson() * new TargetCulture() / new MakeAction());
             MainFlow.Instance.Append(new PackCommand() / new FindDirectory() / new PackAction());

@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using _ReplaceString_.Command;
+using _ReplaceString_.Translator.UI;
 
 namespace _ReplaceString_
 {

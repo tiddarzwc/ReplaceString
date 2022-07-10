@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using Microsoft.Xna.Framework;
+using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using static _ReplaceString_.Config.Constant;
@@ -12,7 +13,7 @@ namespace _ReplaceString_.Config
 {
     internal class ModDefinitionListElement : ConfigElement<List<ModDefinition>>
     {
-        public bool loading;
+        public UIElement modsMenu;
         public string filterWord = string.Empty;
         public bool needUpdate = true;
         public bool filterHooked = false;
@@ -24,32 +25,12 @@ namespace _ReplaceString_.Config
         public List<ModDefinition> ModList => Value;
         public override void OnInitialize()
         {
-            base.OnInitialize();
 
             if (ReplaceString.Catcher.modInfos.Count == 0)
             {
-                UIElement modsMenu = (UIElement)typeof(ModContent).Assembly.DefinedTypes.First(t => t.Name == "Interface")
-                    .GetField("modsMenu", BindingFlags.Static | BindingFlags.NonPublic)
-                    .GetValue(null);
-                modsMenu.GetType().GetField("_cts", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(modsMenu, new CancellationTokenSource());
-                modsMenu.GetType().GetField("loading", BindingFlags.Instance | BindingFlags.Public).SetValue(modsMenu, true);
-                modsMenu.GetType().GetMethod("Populate", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(modsMenu, null);
-                Height.Set(TEXT_HEIGHT * 2, 0);
-                loading = true;
-                var loadUI = new LoadingElement(modsMenu)
-                {
-                    Height = new StyleDimension(TEXT_HEIGHT, 0),
-                    MarginTop = TEXT_HEIGHT
-                };
-                Append(loadUI);
-                loadUI.Activate();
-                Append(new UIElement());//加一个空UI凑数
+                ModCatcher.ForceLoadIcon().Wait();
             }
-            else
-            {
-                loading = false;
-                ResetChildren();
-            }
+            ResetChildren();
         }
         public void OnChange()
         {
@@ -57,11 +38,6 @@ namespace _ReplaceString_.Config
         }
         public override void Update(GameTime gameTime)
         {
-            if (loading)
-            {
-                base.Update(gameTime);
-                return;
-            }
             if (!filterHooked)
             {
                 //TODO tml随便一动就可能炸掉
@@ -97,11 +73,13 @@ namespace _ReplaceString_.Config
         }
         public override void Recalculate()
         {
+
             Height.Set(MOD_HEIGHT * (Value.Count + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2, 0);
             if (Parent != null)
             {
-                Parent.Height.Pixels = Height.Pixels;
+                Parent.Height = Height;
             }
+
             base.Recalculate();
         }
         public void ResetChildren()
@@ -117,6 +95,13 @@ namespace _ReplaceString_.Config
                 };
                 Append(ui);
                 ui.Activate();
+                ui.OnClick += (evt, listeningElement) =>
+                {
+                    SoundEngine.PlaySound(SoundID.MenuTick);
+                    ModList.Remove(ui.value);
+                    OnChange();
+                    uiFilter.SetText("");
+                };
             }
             var select = new ModSelectedElement
             {
