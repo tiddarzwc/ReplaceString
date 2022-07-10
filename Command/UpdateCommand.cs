@@ -24,8 +24,8 @@ namespace _ReplaceString_.Command
         {
             var args = MainFlow.Instance.arguments.ToArray();
             var oldPath = $"{Main.SavePath}/Mods/ReplaceString/{args[0]}";
-            var newPath = $"{Main.SavePath}/Mods/ReplaceString/{args[0]}";
-            var translation = $"{Main.SavePath}/Mods/ReplaceString/{args[0]}";
+            var newPath = $"{Main.SavePath}/Mods/ReplaceString/{args[1]}";
+            var translation = $"{Main.SavePath}/Mods/ReplaceString/{args[2]}";
             var oldTree = TreeNode.ReadHjson(HjsonValue.Load(File.Open(oldPath, FileMode.Open)));
             var newTree = TreeNode.ReadHjson(HjsonValue.Load(File.Open(newPath, FileMode.Open)));
             var transTree = TreeNode.ReadHjson(HjsonValue.Load(File.Open(translation, FileMode.Open)));

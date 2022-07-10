@@ -302,6 +302,7 @@ namespace _ReplaceString_
             MainFlow.Instance.Append(new ImportCommand() / new FindModFlow() / new ImportAction());
             MainFlow.Instance.Append(new MakeCommand() / new FindHjson() * new TargetCulture() / new MakeAction());
             MainFlow.Instance.Append(new PackCommand() / new FindDirectory() / new PackAction());
+            MainFlow.Instance.Append(new UpdateCommand() / new FindHjson() * new FindHjson() * new FindHjson() / new UpdateAction());
         }
 
         public override void Unload()

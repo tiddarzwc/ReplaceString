@@ -48,13 +48,15 @@ namespace _ReplaceString_.Translator
                     }
                     else
                     {
-                        CacheInfo.AppendLine($"New Value : {child.name}");
+                        CacheInfo.AppendLine($"New Entry : ({child.name}, {child.value})");
                     }
                 }
 
-                foreach (var key in old.Where(pair => !pair.Value).Select(pair => pair.Key))
+                foreach (var value in old.Where(pair => !pair.Value).Select(pair => pair.Key))
                 {
-                    CacheInfo.AppendLine($"Missing Value : {key}");
+                    var name = oldLeafs.First(l => l.value == value).name;
+                    CacheInfo.AppendLine($"Missing Entry : ({name} : {value}) - ({translation[name]})");
+                    oldLeafs.RemoveAt(oldLeafs.FindIndex(l => l.value == value));
                 }
             }
         }

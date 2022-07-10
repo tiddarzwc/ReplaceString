@@ -15,7 +15,7 @@ namespace _ReplaceString_.Command
             {
                 Directory.CreateDirectory($"{Main.SavePath}/Mods/ReplaceString");
             }
-            using FileStream file = new FileStream($"{Main.SavePath}/Mods/ReplaceString/{mod.Name}-{Language.ActiveCulture.Name}.hjson", FileMode.Create);
+            using FileStream file = new FileStream($"{Main.SavePath}/Mods/ReplaceString/{mod.Name}-{mod.Version.ToString().Replace(".","")}-{Language.ActiveCulture.Name}.hjson", FileMode.Create);
             export.Hjson(file);
         }
     }
