@@ -16,6 +16,11 @@ namespace _ReplaceString_.Config
         public override void OnInitialize()
         {
             base.OnActivate();
+            ResetChildren();
+            OnUpdate += ModSelectedElement_OnUpdate;
+        }
+        public void ResetChildren()
+        {
             Elements.Clear();
             foreach (var (mod, info) in ModList.GetUnAddedMod().OrderBy(mod => mod.Key))
             {
@@ -26,35 +31,24 @@ namespace _ReplaceString_.Config
                     Height = new StyleDimension(MOD_HEIGHT, 0)
                 };
                 Append(ui);
+                ui.Activate();
+                ui.OnClick += (evt, listeningElement) =>
+                {
+                    SoundEngine.PlaySound(SoundID.MenuTick);
+                    var modlist = Parent as ModDefinitionListElement;
+                    RemoveChild(this);
+                    modlist.ModList.Add(ui.value);
+                    modlist.OnChange();
+                    modlist.uiFilter.SetText("");
+                    modlist.needUpdate = true;
+                };
             }
-            OnUpdate += ModSelectedElement_OnUpdate;
         }
-
         private void ModSelectedElement_OnUpdate(UIElement affectedElement)
         {
             if (ModList.needUpdate)
             {
-                Elements.Clear();
-                foreach (var (mod, info) in ModList.GetUnAddedMod().OrderBy(mod => mod.Key))
-                {
-                    var ui = new ModDefinitionElement(new ModDefinition(mod, info.displayName))
-                    {
-                        MarginTop = MOD_HEIGHT * Elements.Count + TEXT_HEIGHT,
-                        Width = Width,
-                        Height = new StyleDimension(MOD_HEIGHT, 0)
-                    };
-                    Append(ui);
-                    ui.Activate();
-                    ui.OnClick += (evt, listeningElement) =>
-                    {
-                        SoundEngine.PlaySound(SoundID.MenuTick);
-                        var modlist = Parent as ModDefinitionListElement;
-                        RemoveChild(this);
-                        modlist.ModList.Add(ui.value);
-                        modlist.OnChange();
-                        modlist.uiFilter.SetText("");
-                    };
-                }
+                ResetChildren();
                 ModList.needUpdate = false;
             }
         }

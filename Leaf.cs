@@ -53,10 +53,13 @@ namespace _ReplaceString_
             {
                 val = "\n\t'''\n\t" + Regex.Replace(val, "[\\n\\r]", "\n\t") + "\n\t'''";
             }
-            else if (Regex.IsMatch(val.Trim(), "^(?:{|}|\\[|\\]|:|,|\\\"|')"))
+            else if (Regex.IsMatch(val.Trim(), "^(?:{|}|\\[|\\]|:|,|\"|')"))
             {
                 val = '\"' + val.Replace("\n", "\\n").Replace("\"", "\\\"") + "\"";
             }
+
+            
+
             return $"{className}{ExportConfig.Space}:{ExportConfig.Space}{val}";
         }
         public string GetValue(string space, bool ignoreEmpty)

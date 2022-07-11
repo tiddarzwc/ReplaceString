@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using ReLogic.Content;
 using Terraria.GameContent.UI.Elements;
-using System.Reflection;
-using System.Threading.Tasks;
 using Terraria.UI;
-using System.Threading;
 
 namespace _ReplaceString_;
 public struct ModInfo
@@ -66,19 +66,37 @@ public class ModCatcher : IDisposable
         hook.Dispose();
         hook = null;
     }
-
-    public static Task ForceLoadIcon()
+    private static object modsMenu;
+    private static FieldInfo info;
+    private static bool loading = false;
+    public static event Action OnFinish;
+    public static bool IsLoading()
     {
-        return Task.Run(() =>
+        if(ReplaceString.Catcher.modInfos.Count == 0 && !loading)
         {
-            var modsMenu = (UIElement)typeof(ModContent).Assembly.DefinedTypes.First(t => t.Name == "Interface")
+            loading = true;
+        }
+        if(!loading)
+        {
+            return false;
+        }
+        
+        if (modsMenu == null)
+        {
+            modsMenu = (UIElement)typeof(ModContent).Assembly.DefinedTypes.First(t => t.Name == "Interface")
                 .GetField("modsMenu", BindingFlags.Static | BindingFlags.NonPublic)
                 .GetValue(null);
             modsMenu.GetType().GetField("_cts", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(modsMenu, new CancellationTokenSource());
-            var info = modsMenu.GetType().GetField("loading", BindingFlags.Instance | BindingFlags.Public);
+            info = modsMenu.GetType().GetField("loading", BindingFlags.Instance | BindingFlags.Public);
             info.SetValue(modsMenu, true);
             modsMenu.GetType().GetMethod("Populate", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(modsMenu, null);
-            while ((bool)info.GetValue(modsMenu)) { }
-        });
+            return false;
+        }
+        loading = (bool)info.GetValue(modsMenu);
+        if(!loading)
+        {
+            OnFinish();
+        }
+        return loading;
     }
 }

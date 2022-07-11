@@ -2,21 +2,23 @@
 using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
+using Terraria.UI.Chat;
 using static _ReplaceString_.Config.Constant;
 
 namespace _ReplaceString_.Config
 {
     internal class ModDefinitionListElement : ConfigElement<List<ModDefinition>>
     {
-        public UIElement modsMenu;
         public string filterWord = string.Empty;
-        public bool needUpdate = true;
-        public bool filterHooked = false;
+        public bool needUpdate = false;
+        public bool filterHooked = false; 
         public UIFocusInputTextFieldReplaced uiFilter = null;
         public IEnumerable<KeyValuePair<string, ModInfo>> GetUnAddedMod()
         {
@@ -25,10 +27,14 @@ namespace _ReplaceString_.Config
         public List<ModDefinition> ModList => Value;
         public override void OnInitialize()
         {
-
-            if (ReplaceString.Catcher.modInfos.Count == 0)
+            if(ModCatcher.IsLoading())
             {
-                ModCatcher.ForceLoadIcon().Wait();
+                ModCatcher.OnFinish += () =>
+                {
+                    needUpdate = true;
+                    DrawLabel = true;
+                };
+                return;
             }
             ResetChildren();
         }
@@ -65,7 +71,7 @@ namespace _ReplaceString_.Config
                 filterHooked = true;
             }
 
-            if (Value.Count != Elements.Count - 1)
+            if (needUpdate)
             {
                 ResetChildren();
             }
@@ -73,8 +79,14 @@ namespace _ReplaceString_.Config
         }
         public override void Recalculate()
         {
+            if(ModCatcher.IsLoading())
+            {
+                DrawLabel = false;
+                base.Recalculate();
+                return;
+            }
 
-            Height.Set(MOD_HEIGHT * (Value.Count + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2, 0);
+            Height.Set(MOD_HEIGHT * (Value.Where(mod => mod.Name.ToLower().StartsWith(filterWord.ToLower()) || mod.DisplayName.ToLower().StartsWith(filterWord.ToLower())).Count() + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2, 0);
             if (Parent != null)
             {
                 Parent.Height = Height;
@@ -85,7 +97,7 @@ namespace _ReplaceString_.Config
         public void ResetChildren()
         {
             Elements.Clear();
-            foreach (var mod in Value.OrderBy(mod => mod.DisplayName))
+            foreach (var mod in Value.Where(mod => mod.Name.ToLower().StartsWith(filterWord.ToLower()) || mod.DisplayName.ToLower().StartsWith(filterWord.ToLower())).OrderBy(mod => mod.DisplayName))
             {
                 var ui = new ModDefinitionElement(mod)
                 {
@@ -101,17 +113,33 @@ namespace _ReplaceString_.Config
                     ModList.Remove(ui.value);
                     OnChange();
                     uiFilter.SetText("");
+                    needUpdate = true;
                 };
             }
             var select = new ModSelectedElement
             {
-                MarginTop = MOD_HEIGHT * Value.Count + TEXT_HEIGHT,
+                MarginTop = MOD_HEIGHT * Value.Where(mod => mod.Name.ToLower().StartsWith(filterWord.ToLower()) || mod.DisplayName.ToLower().StartsWith(filterWord.ToLower())).Count() + TEXT_HEIGHT,
                 Width = Width,
                 Height = new StyleDimension(TEXT_HEIGHT + GetUnAddedMod().Count() * MOD_HEIGHT, 0)
             };
             Append(select);
             select.Activate();
             Recalculate();
+        }
+
+        protected override void DrawSelf(SpriteBatch spriteBatch)
+        {
+            base.DrawSelf(spriteBatch);
+            CalculatedStyle dimensions = GetDimensions();
+            float settingsWidth = dimensions.Width + 1f;
+            Vector2 position = new Vector2(dimensions.X, dimensions.Y);
+            Vector2 baseScale = new Vector2(0.8f);
+            if (!DrawLabel)
+            {
+                position.X += 8f;
+                position.Y += 8f;
+                ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value, "Loading...", position, Color.White, 0f, Vector2.Zero, baseScale, settingsWidth);
+            }
         }
     }
 
