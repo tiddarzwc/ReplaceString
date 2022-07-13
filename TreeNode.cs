@@ -89,7 +89,7 @@ namespace _ReplaceString_
                 sb.AppendLine(tab + name + ExportConfig.Space + ':' + ExportConfig.Space + '{');
                 foreach (var child in children)
                 {
-                    if (ExportConfig.Tight)
+                    if (!ExportConfig.Tight)
                     {
                         sb.AppendLine(child.BuildHjson(depth + 1).ToString());
                     }

@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Text;
 using Terraria.ModLoader.Config;
+using System.Linq;
+using System.Reflection;
+using MonoMod.RuntimeDetour;
+using Terraria.UI;
+using MonoMod.Cil;
+using Mono.Cecil.Cil;
 
 namespace _ReplaceString_.Translator.UI
 {
