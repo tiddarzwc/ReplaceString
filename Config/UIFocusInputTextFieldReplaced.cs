@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
@@ -14,6 +15,49 @@ namespace _ReplaceString_.Config
 {
     internal class UIFocusInputTextFieldReplaced : UIElement
     {
+        public static bool TextChanged { get; set; }
+        public static string Text { get; private set; } = string.Empty;
+        public static UIFocusInputTextFieldReplaced instance;
+        public static bool TryRepalce(UIElement parent)
+        {
+            Queue<UIElement> queue = new Queue<UIElement>();
+            queue.Enqueue(parent);
+            while(queue.Count != 0)
+            {
+                var ui = queue.Dequeue();
+                var list = (List<UIElement>)typeof(UIElement).GetField("Elements", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ui);
+                for (int i = 0; i < list.Count; i++)
+                {
+                    if (list[i].GetType().Name == "UIFocusInputTextField")
+                    {
+                        list.RemoveAt(i);
+                        var replace = new UIFocusInputTextFieldReplaced("Filter Mods");
+                        replace.SetText("");
+                        replace.Top.Set(5f, 0f);
+                        replace.Left.Set(10f, 0f);
+                        replace.Width.Set(-20f, 1f);
+                        replace.Height.Set(20f, 0f);
+                        replace.OnRightClick += delegate
+                        {
+                            replace.SetText("");
+                        };
+                        replace.OnTextChange += delegate
+                        {
+                            TextChanged = true;
+                        };
+                        ui.Append(replace);
+                        replace.Activate();
+                        return true;
+                    }
+                    else if (list[i].GetType().Name == "UIFocusInputTextFieldReplaced")
+                    {
+                        return false;
+                    }
+                    queue.Enqueue(list[i]);
+                }
+            }
+            return false;
+        }
         internal bool Focused;
 
         internal string CurrentString = "";
@@ -39,6 +83,7 @@ namespace _ReplaceString_.Config
         public UIFocusInputTextFieldReplaced(string hintText)
         {
             _hintText = hintText;
+            instance = this;
         }
 
         public void SetText(string text)
@@ -50,6 +95,7 @@ namespace _ReplaceString_.Config
             if (CurrentString != text)
             {
                 CurrentString = text;
+                Text = text ?? string.Empty;
                 OnTextChange?.Invoke(this, new EventArgs());
             }
         }
@@ -90,11 +136,13 @@ namespace _ReplaceString_.Config
                 if (!newString.Equals(CurrentString))
                 {
                     CurrentString = newString;
+                    Text = newString ?? string.Empty;
                     OnTextChange?.Invoke(this, new EventArgs());
                 }
                 else
                 {
                     CurrentString = newString;
+                    Text = newString ?? string.Empty;
                 }
                 if (JustPressed(Keys.Tab))
                 {

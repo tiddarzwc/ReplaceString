@@ -26,8 +26,9 @@ namespace _ReplaceString_.Config
             {
                 var ui = new ModDefinitionElement(new ModDefinition(mod, info.displayName))
                 {
+                    MarginLeft = 8,
                     MarginTop = MOD_HEIGHT * Elements.Count + TEXT_HEIGHT,
-                    Width = Width,
+                    Width = new StyleDimension(-16, 1),
                     Height = new StyleDimension(MOD_HEIGHT, 0)
                 };
                 Append(ui);
@@ -35,12 +36,12 @@ namespace _ReplaceString_.Config
                 ui.OnClick += (evt, listeningElement) =>
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
-                    var modlist = Parent as ModDefinitionListElement;
-                    RemoveChild(this);
+                    var modlist = ModList;
+                    RemoveChild(ui);
                     modlist.ModList.Add(ui.value);
                     modlist.OnChange();
-                    modlist.uiFilter.SetText("");
                     modlist.needUpdate = true;
+                    UIFocusInputTextFieldReplaced.instance.SetText("");
                 };
             }
         }

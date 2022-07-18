@@ -19,6 +19,7 @@ namespace _ReplaceString_.Translator.UI
     internal class ExportElement : ConfigElement<bool>
     {
         public ModDefinitionElement selected;
+        public bool fliterHooked = false;
         public override void OnInitialize()
         {
             if (ModCatcher.IsLoading())
@@ -33,17 +34,16 @@ namespace _ReplaceString_.Translator.UI
             UIPanel panel = new UIPanel()
             {
                 Width = new StyleDimension(50, 0),
-                MarginRight = 4,
+                MarginRight = 8,
                 MarginTop = 4,
                 HAlign = 1f,
-                Height = new StyleDimension(30, 0)
+                Height = new StyleDimension(26, 0)
             };
             panel.OnMouseOver += (evt, listeningElement) =>
             {
-                if(selected != null)
+                if (selected != null)
                 {
-
-                panel.BackgroundColor = new Color(44,57,105,178).MultiplyRGBA(new Color(180, 180, 180));
+                    panel.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
                 }
             };
             panel.OnMouseOut += (evt, listeningElement) =>
@@ -74,14 +74,39 @@ namespace _ReplaceString_.Translator.UI
             };
             panel.Append(text);
 
+            ResetChildren();
+
+
+        }
+        public override void Update(GameTime gameTime)
+        {
+            if(!fliterHooked)
+            {
+                UIFocusInputTextFieldReplaced.TryRepalce(Parent.Parent.Parent.Parent.Parent);
+                fliterHooked = true;
+            }
+            if(UIFocusInputTextFieldReplaced.TextChanged)
+            {
+                ResetChildren();
+                UIFocusInputTextFieldReplaced.TextChanged = false;
+            }
+            base.Update(gameTime);
+        }
+        public void ResetChildren()
+        {
             int height = 30;
-            foreach (var mod in ModLoader.Mods.Where(mod => mod.Name != "ModLoader"))
+            selected = null;
+            Elements.RemoveAll(ui => ui is ModDefinitionElement);
+            foreach (var mod in ModLoader.Mods.Where(mod => mod.Name != "ModLoader")
+                .Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text) ||
+                mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text)))
             {
                 var ui = new ModDefinitionElement(new ModDefinition(mod.Name, mod.DisplayName))
                 {
+                    MarginLeft = 8,
                     MarginTop = height,
-                    Height = new StyleDimension(Constant.ICON_SIZE, 0),
-                    Width = Parent.Width
+                    Height = new StyleDimension(Constant.MOD_HEIGHT, 0),
+                    Width = new StyleDimension(-16, 1)
                 };
                 Append(ui);
                 ui.OnClick += (evt, listeningElement) =>
@@ -105,13 +130,10 @@ namespace _ReplaceString_.Translator.UI
                     }
 
                 };
-                height += Constant.ICON_SIZE;
+                height += Constant.MOD_HEIGHT;
                 ui.Activate();
             }
-
-
         }
-
         public override void Recalculate()
         {
             if (ModCatcher.IsLoading())
@@ -120,7 +142,7 @@ namespace _ReplaceString_.Translator.UI
                 return;
             }
 
-            Height.Set(Elements.Count * Constant.ICON_SIZE, 0);
+            Height.Set(Elements.Count * Constant.MOD_HEIGHT -8 , 0);
             if (Parent != null)
             {
                 Parent.Height.Pixels = Height.Pixels;

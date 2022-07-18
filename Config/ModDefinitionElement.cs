@@ -1,6 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ModLoader.Config.UI;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 using static _ReplaceString_.Config.Constant;
 
@@ -60,6 +64,14 @@ namespace _ReplaceString_.Config
                     text.TextColor = Color.White;
                 }
             };
+        }
+
+        protected override void DrawSelf(SpriteBatch spriteBatch)
+        {
+            base.DrawSelf(spriteBatch);
+            var dimension = GetDimensions();
+			Color panelColor = IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlue.MultiplyRGBA(new Color(180, 180, 180));
+            ConfigElement.DrawPanel2(spriteBatch, new Vector2(dimension.X, dimension.Y + 1), TextureAssets.SettingsPanel.Value, dimension.Width, dimension.Height - 2, panelColor );
         }
 
         private void DeleteButton_OnClick(UIMouseEvent evt, UIElement listeningElement)

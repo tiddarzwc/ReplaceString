@@ -16,13 +16,14 @@ namespace _ReplaceString_.Config
 {
     internal class ModDefinitionListElement : ConfigElement<List<ModDefinition>>
     {
-        public string filterWord = string.Empty;
         public bool needUpdate = false;
         public bool filterHooked = false; 
-        public UIFocusInputTextFieldReplaced uiFilter = null;
         public IEnumerable<KeyValuePair<string, ModInfo>> GetUnAddedMod()
         {
-            return ReplaceString.Catcher.modInfos.Where(mod => mod.Key.ToLower().StartsWith(filterWord.ToLower()) || mod.Value.displayName.ToLower().StartsWith(filterWord.ToLower())).Where(mod => Value.All(added => added.Name != mod.Key));
+            return ReplaceString.Catcher.modInfos
+                .Where(mod => mod.Key.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) 
+                || mod.Value.displayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
+                .Where(mod => Value.All(added => added.Name != mod.Key));
         }
         public List<ModDefinition> ModList => Value;
         public override void OnInitialize()
@@ -46,33 +47,13 @@ namespace _ReplaceString_.Config
         {
             if (!filterHooked)
             {
-                //TODO tml随便一动就可能炸掉
-                UIElement panel = Parent.Parent.Parent.Parent.Parent.Children.First(t => t.GetType() == typeof(UIPanel));
-                var list = (List<UIElement>)panel.GetType().GetField("Elements", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(panel);
-                var replace = new UIFocusInputTextFieldReplaced("Filter Mods");
-                replace.SetText("");
-                replace.Top.Set(5f, 0f);
-                replace.Left.Set(10f, 0f);
-                replace.Width.Set(-20f, 1f);
-                replace.Height.Set(20f, 0f);
-                replace.OnTextChange += delegate
-                {
-                    needUpdate = true;
-                    filterWord = replace.CurrentString;
-                };
-                replace.OnRightClick += delegate
-                {
-                    replace.SetText("");
-                };
-                list.Clear();
-                panel.Append(replace);
-                replace.Activate();
-                uiFilter = replace;
+                UIFocusInputTextFieldReplaced.TryRepalce(Parent.Parent.Parent.Parent.Parent);
                 filterHooked = true;
             }
 
-            if (needUpdate)
+            if (UIFocusInputTextFieldReplaced.TextChanged || needUpdate)
             {
+                UIFocusInputTextFieldReplaced.TextChanged = false;
                 ResetChildren();
             }
             base.Update(gameTime);
@@ -86,7 +67,7 @@ namespace _ReplaceString_.Config
                 return;
             }
 
-            Height.Set(MOD_HEIGHT * (Value.Where(mod => mod.Name.ToLower().StartsWith(filterWord.ToLower()) || mod.DisplayName.ToLower().StartsWith(filterWord.ToLower())).Count() + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2, 0);
+            Height.Set(MOD_HEIGHT * (Value.Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) || mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())).Count() + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2, 0);
             if (Parent != null)
             {
                 Parent.Height = Height;
@@ -97,12 +78,13 @@ namespace _ReplaceString_.Config
         public void ResetChildren()
         {
             Elements.Clear();
-            foreach (var mod in Value.Where(mod => mod.Name.ToLower().StartsWith(filterWord.ToLower()) || mod.DisplayName.ToLower().StartsWith(filterWord.ToLower())).OrderBy(mod => mod.DisplayName))
+            foreach (var mod in Value.Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) || mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())).OrderBy(mod => mod.DisplayName))
             {
                 var ui = new ModDefinitionElement(mod)
                 {
+                    MarginLeft = 8,
                     MarginTop = MOD_HEIGHT * Elements.Count + TEXT_HEIGHT,
-                    Width = Width,
+                    Width = new StyleDimension(-16, 1),
                     Height = new StyleDimension(MOD_HEIGHT, 0)
                 };
                 Append(ui);
@@ -112,13 +94,13 @@ namespace _ReplaceString_.Config
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     ModList.Remove(ui.value);
                     OnChange();
-                    uiFilter.SetText("");
+                    UIFocusInputTextFieldReplaced.instance.SetText("");
                     needUpdate = true;
                 };
             }
             var select = new ModSelectedElement
             {
-                MarginTop = MOD_HEIGHT * Value.Where(mod => mod.Name.ToLower().StartsWith(filterWord.ToLower()) || mod.DisplayName.ToLower().StartsWith(filterWord.ToLower())).Count() + TEXT_HEIGHT,
+                MarginTop = MOD_HEIGHT * Value.Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) || mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())).Count() + TEXT_HEIGHT,
                 Width = Width,
                 Height = new StyleDimension(TEXT_HEIGHT + GetUnAddedMod().Count() * MOD_HEIGHT, 0)
             };
