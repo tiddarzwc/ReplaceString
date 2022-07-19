@@ -53,7 +53,7 @@ namespace _ReplaceString_.Config
                         panel = ui;
                         origin = list[i];
                         list.RemoveAt(i);
-                        var replace = new UIFocusInputTextFieldReplaced("Filter Mods");
+                        var replace = new UIFocusInputTextFieldReplaced("Fliter Mods");
                         replace.SetText("");
                         replace.Top.Set(5f, 0f);
                         replace.Left.Set(10f, 0f);

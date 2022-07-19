@@ -41,5 +41,9 @@ internal class WorkConfig : ModConfig
     [Label("Pack")]
     [CustomModConfigItem(typeof(PackElement))]
     public object pack;
+
+    [Label("Update")]
+    [CustomModConfigItem(typeof(UpdateElement))]
+    public object update;
 }
 #pragma warning restore CS0649

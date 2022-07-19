@@ -26,13 +26,17 @@ internal class PackElement : ConfigElement
         DrawLabel = false;
         OnUpdate += delegate
         {
-            if (!fliterHooked)
-            {
-                UIFocusInputTextFieldReplaced.TryRepalce(Parent.Parent.Parent.Parent.Parent);
-                fliterHooked = true;
-                UIFocusInputTextFieldReplaced.instance.hintText = "Fliter File";
-            }
+            //if (!fliterHooked)
+            //{
+            //    UIFocusInputTextFieldReplaced.TryRepalce(Parent.Parent.Parent.Parent.Parent);
+            //    fliterHooked = true;
+            //    UIFocusInputTextFieldReplaced.instance.hintText = "Fliter File";
+            //}
             UIFocusInputTextFieldReplaced.enable = true;
+            if (UIFocusInputTextFieldReplaced.TextChanged)
+            {
+                ResetChildren();
+            }
         };
         ResetChildren();
     }
@@ -126,7 +130,9 @@ internal class PackElement : ConfigElement
 
 
         int margin = 30;
-        foreach (var dir in Directory.GetDirectories($"{Main.SavePath}/Mods/ReplaceString").Select(p => Path.GetFileName(p)))
+        foreach (var dir in Directory.GetDirectories($"{Main.SavePath}/Mods/ReplaceString")
+            .Where(p => p.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
+            .Select(p => Path.GetFileName(p)))
         {
             var ui = new UIPanel()
             {

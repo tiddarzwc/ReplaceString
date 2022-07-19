@@ -26,9 +26,13 @@ internal class MakeElement : ConfigElement
             {
                 UIFocusInputTextFieldReplaced.TryRepalce(Parent.Parent.Parent.Parent.Parent);
                 fliterHooked = true;
-                UIFocusInputTextFieldReplaced.instance.hintText = "Fliter File";
+                UIFocusInputTextFieldReplaced.instance.hintText = "Fliter Files";
             }
             UIFocusInputTextFieldReplaced.enable = true;
+            if(UIFocusInputTextFieldReplaced.TextChanged)
+            {
+                ResetChildren();
+            }
         };
         ResetChildren();
     }
@@ -125,7 +129,10 @@ internal class MakeElement : ConfigElement
 
 
         int margin = 30;
-        foreach (var file in Directory.GetFiles($"{Main.SavePath}/Mods/ReplaceString").Where(p => Path.GetExtension(p) == ".hjson").Select(p => Path.GetFileName(p)))
+        foreach (var file in Directory.GetFiles($"{Main.SavePath}/Mods/ReplaceString")
+            .Where(p => Path.GetExtension(p) == ".hjson")
+            .Where(p => p.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
+            .Select(p => Path.GetFileName(p)))
         {
             var ui = new UIPanel()
             {

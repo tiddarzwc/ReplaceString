@@ -47,6 +47,7 @@ namespace _ReplaceString_.Config
             {
                 UIFocusInputTextFieldReplaced.TryRepalce(Parent.Parent.Parent.Parent.Parent);
                 filterHooked = true;
+                UIFocusInputTextFieldReplaced.instance.hintText = "Fliter Mods";
             }
             UIFocusInputTextFieldReplaced.enable = true;
 

@@ -89,6 +89,7 @@ internal class ExportElement : ConfigElement<object>
         {
             UIFocusInputTextFieldReplaced.TryRepalce(Parent.Parent.Parent.Parent.Parent);
             fliterHooked = true;
+            UIFocusInputTextFieldReplaced.instance.hintText = "Fliter Mods";
         }
         UIFocusInputTextFieldReplaced.enable = true;
         if (UIFocusInputTextFieldReplaced.TextChanged)
@@ -104,8 +105,8 @@ internal class ExportElement : ConfigElement<object>
         selected = null;
         Elements.RemoveAll(ui => ui is ModDefinitionElement);
         foreach (var mod in ModLoader.Mods.Where(mod => mod.Name != "ModLoader")
-            .Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text) ||
-            mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text)))
+            .Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) ||
+            mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())))
         {
             var ui = new ModDefinitionElement(new ModDefinition(mod.Name, mod.DisplayName))
             {
