@@ -1,5 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using _ReplaceString_.Config;
 using Hjson;
 using Microsoft.Xna.Framework;
@@ -13,7 +17,7 @@ using Terraria.UI;
 
 namespace _ReplaceString_.Translator.UI;
 
-internal class MakeElement : ConfigElement
+internal class PackElement : ConfigElement
 {
     public UIText selected = null;
     public bool fliterHooked = false;
@@ -61,13 +65,10 @@ internal class MakeElement : ConfigElement
             {
                 SoundEngine.PlaySound(SoundID.MenuOpen);
                 var path = $"{Main.SavePath}/Mods/ReplaceString/{selected.Text}";
-                if (File.Exists(path))
+                if (Directory.Exists(path))
                 {
-                    using var file = new FileStream(path, FileMode.Open);
-                    Make.SetupFolds(TreeNode.ReadHjson(HjsonValue.Load(file)),
-                        new MakeConfig(Path.GetFileName(path).Split('-')[0],
-                        (int)(GameCulture.CultureName)typeof(GameCulture.CultureName).GetEnumValues().Cast<object>().First(c => c.ToString() == ModContent.GetInstance<WorkConfig>().culture),
-                        true, ModContent.GetInstance<WorkConfig>().ignoreSpace));
+                    var (treeNode, config) = Pack.Packup(path);
+                    File.WriteAllText($"{Main.SavePath}/Mods/ReplaceString/{treeNode.name}-{GameCulture.FromCultureName((GameCulture.CultureName)config.TargetCultureID).Name}-packed.hjson", treeNode.BuildHjson(0).ToString());
                 }
                 else
                 {
@@ -77,7 +78,7 @@ internal class MakeElement : ConfigElement
         };
         Append(panel);
 
-        UIText text = new UIText("Make")
+        UIText text = new UIText("Pack")
         {
             HAlign = 0.5f,
             VAlign = 0.5f,
@@ -125,7 +126,7 @@ internal class MakeElement : ConfigElement
 
 
         int margin = 30;
-        foreach (var file in Directory.GetFiles($"{Main.SavePath}/Mods/ReplaceString").Where(p => Path.GetExtension(p) == ".hjson").Select(p => Path.GetFileName(p)))
+        foreach (var dir in Directory.GetDirectories($"{Main.SavePath}/Mods/ReplaceString").Select(p => Path.GetFileName(p)))
         {
             var ui = new UIPanel()
             {
@@ -134,7 +135,7 @@ internal class MakeElement : ConfigElement
                 Width = new StyleDimension(-16, 1),
                 MarginLeft = 8
             };
-            var fileName = new UIText(file)
+            var fileName = new UIText(dir)
             {
                 HAlign = 0.5f
             };

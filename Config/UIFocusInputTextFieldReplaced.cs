@@ -17,7 +17,27 @@ namespace _ReplaceString_.Config
     {
         public static bool TextChanged { get; set; }
         public static string Text { get; private set; } = string.Empty;
+        public static UIElement panel;
+        public static UIElement origin;
         public static UIFocusInputTextFieldReplaced instance;
+        public static bool enable = true;
+        public static void Recover()
+        {
+            if(origin != null)
+            {
+                panel.RemoveChild(instance);
+                panel.Append(origin);
+            }
+        }
+        public static void Check()
+        {
+            if(enable)
+            {
+                enable = false;
+                return;
+            }
+            Recover();
+        }
         public static bool TryRepalce(UIElement parent)
         {
             Queue<UIElement> queue = new Queue<UIElement>();
@@ -30,6 +50,8 @@ namespace _ReplaceString_.Config
                 {
                     if (list[i].GetType().Name == "UIFocusInputTextField")
                     {
+                        panel = ui;
+                        origin = list[i];
                         list.RemoveAt(i);
                         var replace = new UIFocusInputTextFieldReplaced("Filter Mods");
                         replace.SetText("");
@@ -62,7 +84,7 @@ namespace _ReplaceString_.Config
 
         internal string CurrentString = "";
 
-        private readonly string _hintText;
+        public string hintText;
 
         private int _textBlinkerCount;
 
@@ -82,7 +104,7 @@ namespace _ReplaceString_.Config
 
         public UIFocusInputTextFieldReplaced(string hintText)
         {
-            _hintText = hintText;
+            this.hintText = hintText;
             instance = this;
         }
 
@@ -167,7 +189,7 @@ namespace _ReplaceString_.Config
             CalculatedStyle space = GetDimensions();
             if (CurrentString.Length == 0 && !Focused)
             {
-                Utils.DrawBorderString(spriteBatch, _hintText, new Vector2(space.X, space.Y), Color.Gray);
+                Utils.DrawBorderString(spriteBatch, hintText, new Vector2(space.X, space.Y), Color.Gray);
             }
             else
             {

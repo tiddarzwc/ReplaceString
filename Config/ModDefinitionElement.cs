@@ -18,7 +18,6 @@ namespace _ReplaceString_.Config
         public override void OnInitialize()
         {
             base.OnInitialize();
-
             if (!ReplaceString.Catcher.modInfos.TryGetValue(value.Name, out var info))
             {
                 info = ModInfo.Default with { displayName = value.DisplayName };
@@ -65,7 +64,7 @@ namespace _ReplaceString_.Config
                 }
             };
         }
-
+        
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);

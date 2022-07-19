@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using _ReplaceString_.Command;
 using _ReplaceString_.Translator.UI;
 using Hjson;
 

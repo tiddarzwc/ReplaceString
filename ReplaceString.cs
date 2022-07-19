@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using _ReplaceString_.Command;
 using _ReplaceString_.Config;
-using DebugCommands.Flow;
-using DebugCommands.Flow.DataFlows;
 using Hjson;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -209,7 +206,6 @@ namespace _ReplaceString_
     }
     public class ReplaceString : Mod
     {
-        public static Mod Command;
         public List<Hook> hooks;
         public List<ILHook> ilHooks;
         public ModCatcher catcher;
@@ -294,20 +290,9 @@ namespace _ReplaceString_
                 });
             }));
         }
-        public override void Load()
-        {
-            Command = ModLoader.GetMod("DebugCommands");
-
-            MainFlow.Instance.Append(new ExportCommand() / new FindModFlow() / new ExporAction());
-            MainFlow.Instance.Append(new ImportCommand() / new FindModFlow() / new ImportAction());
-            MainFlow.Instance.Append(new MakeCommand() / new FindHjson() * new TargetCulture() / new MakeAction());
-            MainFlow.Instance.Append(new PackCommand() / new FindDirectory() / new PackAction());
-            MainFlow.Instance.Append(new UpdateCommand() / new FindHjson() * new FindHjson() * new FindHjson() / new UpdateAction());
-        }
 
         public override void Unload()
         {
-            Command = null;
             foreach (var hook in hooks)
             {
                 hook.Dispose();

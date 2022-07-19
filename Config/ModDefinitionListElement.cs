@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using Terraria.GameContent;
-using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
@@ -17,18 +15,18 @@ namespace _ReplaceString_.Config
     internal class ModDefinitionListElement : ConfigElement<List<ModDefinition>>
     {
         public bool needUpdate = false;
-        public bool filterHooked = false; 
+        public bool filterHooked = false;
         public IEnumerable<KeyValuePair<string, ModInfo>> GetUnAddedMod()
         {
             return ReplaceString.Catcher.modInfos
-                .Where(mod => mod.Key.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) 
+                .Where(mod => mod.Key.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())
                 || mod.Value.displayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
                 .Where(mod => Value.All(added => added.Name != mod.Key));
         }
         public List<ModDefinition> ModList => Value;
         public override void OnInitialize()
         {
-            if(ModCatcher.IsLoading())
+            if (ModCatcher.IsLoading())
             {
                 ModCatcher.OnFinish += () =>
                 {
@@ -50,6 +48,7 @@ namespace _ReplaceString_.Config
                 UIFocusInputTextFieldReplaced.TryRepalce(Parent.Parent.Parent.Parent.Parent);
                 filterHooked = true;
             }
+            UIFocusInputTextFieldReplaced.enable = true;
 
             if (UIFocusInputTextFieldReplaced.TextChanged || needUpdate)
             {
@@ -60,14 +59,14 @@ namespace _ReplaceString_.Config
         }
         public override void Recalculate()
         {
-            if(ModCatcher.IsLoading())
+            if (ModCatcher.IsLoading())
             {
                 DrawLabel = false;
                 base.Recalculate();
                 return;
             }
 
-            Height.Set(MOD_HEIGHT * (Value.Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) || mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())).Count() + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2, 0);
+            Height.Set(MOD_HEIGHT * (Value.Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) || mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())).Count() + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2 + 8, 0);
             if (Parent != null)
             {
                 Parent.Height = Height;

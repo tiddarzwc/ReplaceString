@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using _ReplaceString_.Command;
 using _ReplaceString_.Translator.UI;
 
 namespace _ReplaceString_
@@ -58,7 +57,7 @@ namespace _ReplaceString_
                 val = '\"' + val.Replace("\n", "\\n").Replace("\"", "\\\"") + "\"";
             }
 
-            
+
 
             return $"{className}{ExportConfig.Space}:{ExportConfig.Space}{val}";
         }
