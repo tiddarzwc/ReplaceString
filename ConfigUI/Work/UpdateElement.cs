@@ -1,13 +1,11 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using _ReplaceString_.Config;
+﻿using System.IO;
+using _ReplaceString_.ConfigUI;
+using _ReplaceString_.ConfigUI.Work;
+using _ReplaceString_.Data;
 using Hjson;
 using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ID;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 namespace _ReplaceString_.Translator.UI;
@@ -62,8 +60,8 @@ internal class UpdateElement : ConfigElement
                 var o = TreeNode.ReadHjson(HjsonValue.Load(path + oldHjson.Text));
                 var n = TreeNode.ReadHjson(HjsonValue.Load(path + newHjson.Text));
                 var t = TreeNode.ReadHjson(HjsonValue.Load(path + transHjson.Text));
-                Translator.Update.UpdateTree(o, n, t);
-                File.WriteAllText(path + "UpdateLog.txt", Translator.Update.CacheInfo.ToString());
+                Package.Update.UpdateTree(o, n, t);
+                File.WriteAllText(path + "UpdateLog.txt", Package.Update.CacheInfo.ToString());
             }
         };
         Append(panel);

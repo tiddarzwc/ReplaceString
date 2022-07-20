@@ -11,7 +11,7 @@ using Terraria;
 using Terraria.GameInput;
 using Terraria.UI;
 
-namespace _ReplaceString_.Config
+namespace _ReplaceString_.ConfigUI
 {
     internal class UIFocusInputTextFieldReplaced : UIElement
     {
@@ -23,7 +23,7 @@ namespace _ReplaceString_.Config
         public static bool enable = true;
         public static void Recover()
         {
-            if(origin != null)
+            if (origin != null)
             {
                 panel.RemoveChild(instance);
                 panel.Append(origin);
@@ -31,7 +31,7 @@ namespace _ReplaceString_.Config
         }
         public static void Check()
         {
-            if(enable)
+            if (enable)
             {
                 enable = false;
                 return;
@@ -42,7 +42,7 @@ namespace _ReplaceString_.Config
         {
             Queue<UIElement> queue = new Queue<UIElement>();
             queue.Enqueue(parent);
-            while(queue.Count != 0)
+            while (queue.Count != 0)
             {
                 var ui = queue.Dequeue();
                 var list = (List<UIElement>)typeof(UIElement).GetField("Elements", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(ui);

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using _ReplaceString_.Config;
-using Hjson;
+using _ReplaceString_.ConfigUI;
+using _ReplaceString_.Package;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;

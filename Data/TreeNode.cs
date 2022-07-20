@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using _ReplaceString_.Translator.UI;
+using _ReplaceString_.ConfigUI.Export;
 using Hjson;
 
 using Terraria.Localization;
 
-namespace _ReplaceString_
+namespace _ReplaceString_.Data
 {
     internal class TreeNode : IEquatable<TreeNode>
     {

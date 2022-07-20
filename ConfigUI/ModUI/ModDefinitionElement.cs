@@ -6,9 +6,9 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.Config.UI;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
-using static _ReplaceString_.Config.Constant;
+using static _ReplaceString_.ConfigUI.Constant;
 
-namespace _ReplaceString_.Config
+namespace _ReplaceString_.ConfigUI.ModUI
 {
 
     public class ModDefinitionElement : UIElement
@@ -64,13 +64,13 @@ namespace _ReplaceString_.Config
                 }
             };
         }
-        
+
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);
             var dimension = GetDimensions();
-			Color panelColor = IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlue.MultiplyRGBA(new Color(180, 180, 180));
-            ConfigElement.DrawPanel2(spriteBatch, new Vector2(dimension.X, dimension.Y + 1), TextureAssets.SettingsPanel.Value, dimension.Width, dimension.Height - 2, panelColor );
+            Color panelColor = IsMouseHovering ? UICommon.DefaultUIBlue : UICommon.DefaultUIBlue.MultiplyRGBA(new Color(180, 180, 180));
+            ConfigElement.DrawPanel2(spriteBatch, new Vector2(dimension.X, dimension.Y + 1), TextureAssets.SettingsPanel.Value, dimension.Width, dimension.Height - 2, panelColor);
         }
 
         private void DeleteButton_OnClick(UIMouseEvent evt, UIElement listeningElement)

@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using _ReplaceString_.Data;
 
-namespace _ReplaceString_.Translator
+namespace _ReplaceString_.Package
 {
     internal static class Update
     {
@@ -27,7 +28,7 @@ namespace _ReplaceString_.Translator
                         CacheInfo.AppendLine($"New Node : {child.name}");
                     }
                 }
-                foreach(var key in old.Where(pair => !pair.Value).Select(pair => pair.Key))
+                foreach (var key in old.Where(pair => !pair.Value).Select(pair => pair.Key))
                 {
                     CacheInfo.AppendLine($"Missing Node : {key}");
                 }
@@ -36,7 +37,7 @@ namespace _ReplaceString_.Translator
             {
                 var oldLeafs = oldRoot.children.Cast<Leaf>().ToList();
                 old = new Dictionary<string, bool>(oldLeafs.Select(c => new KeyValuePair<string, bool>(c.value, false)));
-                
+
                 foreach (Leaf child in newRoot.children.Cast<Leaf>())
                 {
                     if (old.ContainsKey(child.value))

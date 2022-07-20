@@ -1,8 +1,10 @@
 ﻿using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using _ReplaceString_.ConfigUI.Work;
+using _ReplaceString_.Data;
 
-namespace _ReplaceString_.Translator
+namespace _ReplaceString_.Package
 {
     internal static class Pack
     {
@@ -367,7 +369,7 @@ namespace _ReplaceString_.Translator
                     }
                 }
             }
-            if(config.LdstrFold)
+            if (config.LdstrFold)
             {
                 PackupLdstr($"{path}/Ldstr", root["Ldstr"]);
             }
@@ -409,12 +411,12 @@ namespace _ReplaceString_.Translator
         {
             var dir = Directory.GetDirectories(path);
             var file = Directory.GetFiles(path);
-            foreach(var d in dir)
+            foreach (var d in dir)
             {
                 PackupLdstr(d, node[d.Split('\\')[^1]]);
             }
 
-            foreach(var f in file)
+            foreach (var f in file)
             {
                 bool begin;
                 var child = node[Path.GetFileNameWithoutExtension(f.Split('\\')[^1])];

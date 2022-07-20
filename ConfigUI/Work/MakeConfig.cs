@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _ReplaceString_.Translator
+namespace _ReplaceString_.ConfigUI.Work
 {
     internal class MakeConfig
     {

@@ -1,7 +1,6 @@
-﻿using _ReplaceString_.Config;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 
-namespace _ReplaceString_;
+namespace _ReplaceString_.ConfigUI;
 internal class UpdateSystem : ILoadable
 {
 

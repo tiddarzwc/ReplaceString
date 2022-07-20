@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Linq;
-using _ReplaceString_.Config;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
@@ -8,7 +7,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
-namespace _ReplaceString_.Translator.UI
+namespace _ReplaceString_.ConfigUI.Work
 {
     internal class FileSelectedUI : UIPanel
     {

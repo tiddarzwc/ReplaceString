@@ -1,4 +1,4 @@
-﻿namespace _ReplaceString_.Config
+﻿namespace _ReplaceString_.ConfigUI
 {
     internal static class Constant
     {

@@ -5,7 +5,10 @@ using System.Text;
 using Terraria;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-namespace _ReplaceString_.Translator
+using _ReplaceString_.ConfigUI.Work;
+using _ReplaceString_.Data;
+
+namespace _ReplaceString_.Package
 {
     internal static class Make
     {

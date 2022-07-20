@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using Terraria.ModLoader.IO;
 
-namespace _ReplaceString_.Config
+namespace _ReplaceString_.ConfigUI.ModUI
 {
     public class ModDefinition : TagSerializable
     {

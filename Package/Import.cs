@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
+using _ReplaceString_.Data;
 using Hjson;
 
 using Mono.Cecil.Cil;
@@ -11,7 +11,7 @@ using MonoMod.RuntimeDetour;
 
 using Terraria.Localization;
 
-namespace _ReplaceString_
+namespace _ReplaceString_.Package
 {
     internal class Import
     {
@@ -240,7 +240,7 @@ namespace _ReplaceString_
                             if (ins.OpCode == OpCodes.Ldstr && ins.Operand.ToString() == replace.Peek().oldString)
                             {
                                 ins.Operand = replace.Dequeue().newString;
-                                if(replace.Count == 0)
+                                if (replace.Count == 0)
                                 {
                                     break;
                                 }

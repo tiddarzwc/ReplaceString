@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using _ReplaceString_.Config;
+using _ReplaceString_.ConfigUI.ModUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -14,7 +14,7 @@ using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace _ReplaceString_.Translator.UI;
+namespace _ReplaceString_.ConfigUI.Export;
 
 internal class ExportElement : ConfigElement<object>
 {
@@ -56,7 +56,7 @@ internal class ExportElement : ConfigElement<object>
             {
                 SoundEngine.PlaySound(SoundID.MenuOpen);
                 var mod = ModLoader.GetMod(selected.value.Name);
-                Export export = new Export(mod);
+                Package.Export export = new Package.Export(mod);
                 if (!Directory.Exists($"{Main.SavePath}/Mods/ReplaceString"))
                 {
                     Directory.CreateDirectory($"{Main.SavePath}/Mods/ReplaceString");
@@ -85,7 +85,7 @@ internal class ExportElement : ConfigElement<object>
     }
     public override void Update(GameTime gameTime)
     {
-        if(!fliterHooked)
+        if (!fliterHooked)
         {
             UIFocusInputTextFieldReplaced.TryRepalce(Parent.Parent.Parent.Parent.Parent);
             fliterHooked = true;
@@ -149,7 +149,7 @@ internal class ExportElement : ConfigElement<object>
             return;
         }
 
-        Height.Set(Elements.Count * Constant.MOD_HEIGHT -8 , 0);
+        Height.Set(Elements.Count * Constant.MOD_HEIGHT - 8, 0);
         if (Parent != null)
         {
             Parent.Height.Pixels = Height.Pixels;
@@ -169,6 +169,6 @@ internal class ExportElement : ConfigElement<object>
             position.Y += 8f;
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value, "Loading...", position, Color.White, 0f, Vector2.Zero, new Vector2(0.8f), settingsWidth);
         }
-     
+
     }
 }

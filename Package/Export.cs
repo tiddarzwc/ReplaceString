@@ -4,14 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-
+using _ReplaceString_.Data;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 using Terraria.Localization;
 using Terraria.ModLoader.Core;
 
-namespace _ReplaceString_
+namespace _ReplaceString_.Package
 {
 
 

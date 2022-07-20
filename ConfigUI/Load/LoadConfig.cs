@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
+using _ReplaceString_.ConfigUI.ModUI;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader.Config;
 
-namespace _ReplaceString_.Config
+namespace _ReplaceString_.ConfigUI.Load
 {
-    public class ReplaceStringConfig : ModConfig
+    public class LoadConfig : ModConfig
     {
         [Label("Autoload Mods")]
         [CustomModConfigItem(typeof(ModDefinitionListElement))]

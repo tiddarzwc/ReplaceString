@@ -8,7 +8,7 @@ using Terraria.UI;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
 
-namespace _ReplaceString_.Translator.UI;
+namespace _ReplaceString_.ConfigUI.Export;
 
 #pragma warning disable CS0649
 internal class ExportConfig : ModConfig

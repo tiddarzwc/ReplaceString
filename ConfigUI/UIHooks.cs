@@ -4,12 +4,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using _ReplaceString_.ConfigUI.Export;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
 using Terraria.ModLoader.Config;
 
-namespace _ReplaceString_.Translator.UI
+namespace _ReplaceString_.ConfigUI
 {
     internal class UIHooks : ILoadable
     {

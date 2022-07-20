@@ -6,9 +6,9 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.UI;
 using Terraria.UI.Chat;
-using static _ReplaceString_.Config.Constant;
+using static _ReplaceString_.ConfigUI.Constant;
 
-namespace _ReplaceString_.Config
+namespace _ReplaceString_.ConfigUI.ModUI
 {
     public class ModSelectedElement : UIElement
     {

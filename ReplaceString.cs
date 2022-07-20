@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using _ReplaceString_.Config;
+using _ReplaceString_.ConfigUI.Load;
+using _ReplaceString_.ConfigUI.ModUI;
+using _ReplaceString_.Package;
 using Hjson;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -238,7 +240,7 @@ namespace _ReplaceString_
                 }
             }));
 
-            ReplaceStringConfig config = new ReplaceStringConfig();
+            LoadConfig config = new LoadConfig();
             try
             {
                 string path = $"{Main.SavePath}/ModConfigs/_ReplaceString__ReplaceStringConfig.json";

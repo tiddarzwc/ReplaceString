@@ -12,7 +12,7 @@ using ReLogic.Content;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace _ReplaceString_;
+namespace _ReplaceString_.ConfigUI.ModUI;
 public struct ModInfo
 {
     public static ModInfo Default => new ModInfo(ModContent.Request<Texture2D>("_ReplaceString_/DeletedMod", AssetRequestMode.ImmediateLoad).Value, false, "Deleted Mod");
@@ -72,15 +72,15 @@ public class ModCatcher : IDisposable
     public static event Action OnFinish;
     public static bool IsLoading()
     {
-        if(ReplaceString.Catcher.modInfos.Count == 0 && !loading)
+        if (ReplaceString.Catcher.modInfos.Count == 0 && !loading)
         {
             loading = true;
         }
-        if(!loading)
+        if (!loading)
         {
             return false;
         }
-        
+
         if (modsMenu == null)
         {
             modsMenu = (UIElement)typeof(ModContent).Assembly.DefinedTypes.First(t => t.Name == "Interface")
@@ -93,7 +93,7 @@ public class ModCatcher : IDisposable
             return false;
         }
         loading = (bool)info.GetValue(modsMenu);
-        if(!loading)
+        if (!loading)
         {
             OnFinish();
         }

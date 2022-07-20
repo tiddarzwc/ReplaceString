@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using _ReplaceString_.Translator.UI;
+using _ReplaceString_.ConfigUI.Export;
 
-namespace _ReplaceString_
+namespace _ReplaceString_.Data
 {
     internal class Leaf : TreeNode
     {
