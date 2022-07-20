@@ -5,7 +5,6 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
 namespace _ReplaceString_.ConfigUI.Work
 {
@@ -36,27 +35,21 @@ namespace _ReplaceString_.ConfigUI.Work
             };
             text = new UIText(hintText)
             {
-                MarginLeft = 4,
-                Width = new StyleDimension(0, 0),
+                Left = new StyleDimension(4, 0),
+                Width = new StyleDimension(0, 1),
                 Height = new StyleDimension(30, 0),
-                TextOriginX = 0.5f,
+                TextOriginX = 0,
                 TextOriginY = 0.5f,
                 TextColor = Color.Gray
             };
             Append(text);
 
-            var expandButton = new UIImageButton(UICommon.ButtonCollapsedTexture)
-            {
-                Left = new StyleDimension(-22, 1),
-                Top = new StyleDimension((30 - UICommon.ButtonCollapsedTexture.Value.Height) / 2, 0)
-            };
-            expandButton.OnClick += delegate
+            text.OnClick += delegate
             {
                 SoundEngine.PlaySound(SoundID.MenuTick);
                 Expand();
                 if (filePanel == null)
                 {
-                    expandButton.SetImage(UICommon.ButtonCollapsedTexture);
                     if (selected != null)
                     {
                         text.TextColor = Color.White;
@@ -70,7 +63,6 @@ namespace _ReplaceString_.ConfigUI.Work
                 }
                 else
                 {
-                    expandButton.SetImage(UICommon.ButtonExpandedTexture);
                     if (selected != null)
                     {
                         selected = filePanel.Children.FirstOrDefault(u => u.Children.First() is UIText t && t.Text == selected.Text).Children.First() as UIText;
@@ -84,7 +76,6 @@ namespace _ReplaceString_.ConfigUI.Work
                     }
                 }
             };
-            Append(expandButton);
         }
 
         public void Expand()

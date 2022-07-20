@@ -68,7 +68,7 @@ namespace _ReplaceString_.Package
                 hookList.Add(name, new List<ILHook>());
             }
             oldTree = new TreeNode(name);
-            Export.GetLdstr(oldTree, name, asmBytes, new HashSet<string>());
+            Export.GetLdstr(oldTree, name, asmBytes);
             AddMapEntry(Language.ActiveCulture);
             AddLdstrAndPath();
         }
