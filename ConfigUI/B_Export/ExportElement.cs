@@ -104,7 +104,7 @@ internal class ExportElement : ConfigElement<object>
         int height = 30;
         selected = null;
         Elements.RemoveAll(ui => ui is ModDefinitionElement);
-        foreach (var mod in ModLoader.Mods.Where(mod => mod.Name != "ModLoader")
+        foreach (var mod in ModLoader.Mods.Where(mod => !ReplaceString.blackList.Any(name => name == mod.Name))
             .Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) ||
             mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())))
         {

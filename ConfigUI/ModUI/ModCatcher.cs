@@ -45,8 +45,12 @@ public class ModCatcher : IDisposable
             cursor.Emit(OpCodes.Ldfld, type.GetField("_mod", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
                 .EmitDelegate((Texture2D icon, object mod) =>
             {
-                modInfos[(string)mod.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance).GetValue(mod)] =
-                    new ModInfo(icon,
+                string name = (string)mod.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance).GetValue(mod);
+                if(ReplaceString.blackList.Contains(name))
+                {
+                    return icon;
+                }
+                modInfos[name] = new ModInfo(icon,
                         (bool)mod.GetType().GetProperty("Enabled", BindingFlags.Public | BindingFlags.Instance).GetValue(mod),
                         (string)mod.GetType().GetProperty("DisplayName", BindingFlags.Public | BindingFlags.Instance).GetValue(mod));
                 return icon;

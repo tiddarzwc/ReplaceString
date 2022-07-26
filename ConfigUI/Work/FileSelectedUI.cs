@@ -25,13 +25,14 @@ namespace _ReplaceString_.ConfigUI.Work
         {
             base.OnInitialize();
             SetPadding(6);
+            BorderColor = Color.Transparent;
             OnMouseOver += (evt, listeningElement) =>
             {
-                BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
+                BorderColor = Color.Gold;
             };
             OnMouseOut += (evt, listeningElement) =>
             {
-                BackgroundColor = new Color(44, 57, 105, 178);
+                BorderColor = Color.Transparent;
             };
             text = new UIText(hintText)
             {
@@ -90,15 +91,17 @@ namespace _ReplaceString_.ConfigUI.Work
             {
                 Top = new StyleDimension(30, 0),
                 Width = new StyleDimension(0, 1),
-                Height = new StyleDimension(40, 0)
+                Height = new StyleDimension(40, 0),
+                BackgroundColor = Color.Transparent,
+                BorderColor = Color.Transparent
             };
             filePanel.OnMouseOver += (evt, listeningElement) =>
             {
-                filePanel.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
+                filePanel.BackgroundColor = Color.Transparent;
             };
             filePanel.OnMouseOut += (evt, listeningElement) =>
             {
-                filePanel.BackgroundColor = new Color(44, 57, 105, 178);
+                filePanel.BackgroundColor = Color.Transparent;
             };
             filePanel.SetPadding(6);
             int height = 0;
@@ -112,15 +115,19 @@ namespace _ReplaceString_.ConfigUI.Work
                     Height = new StyleDimension(30, 0),
                     Top = new StyleDimension(height, 0),
                     Width = new StyleDimension(0, 1),
+                    BackgroundColor = new Color(44 - 23 - 10, 57 - 23 - 5, 105 - 23, 178),
+                    BorderColor = Color.Transparent
                 };
                 ui.SetPadding(6);
-                var fileName = new UIText(file)
+                var fileName = new UIText($"◆ {file}")
                 {
                     TextOriginY = 0.5f
                 };
                 ui.OnMouseOver += (evt, listeningElement) =>
                 {
-                    ui.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
+                    ui.BackgroundColor = new Color(44 - 23 - 10, 57 - 23 - 5, 105 - 23, 178);
+                    ui.BorderColor = Color.Gold;
+                    //ui.BackgroundColor = Color.Blue;
                     if (fileName.TextColor == Color.White)
                     {
                         fileName.TextColor = Color.Yellow;
@@ -128,7 +135,8 @@ namespace _ReplaceString_.ConfigUI.Work
                 };
                 ui.OnMouseOut += (evt, listeningElement) =>
                 {
-                    ui.BackgroundColor = new Color(44, 57, 105, 178);
+                    ui.BackgroundColor = new Color(44 - 23, 57 - 23, 105 - 23, 178);
+                    ui.BorderColor = Color.Transparent;
                     if (fileName.TextColor == Color.Yellow)
                     {
                         fileName.TextColor = Color.White;
@@ -159,6 +167,29 @@ namespace _ReplaceString_.ConfigUI.Work
                 ui.Activate();
                 filePanel.Append(ui);
             }
+
+            if (!filePanel.Children.Any())
+            {
+                var ui = new UIPanel()
+                {
+                    Height = new StyleDimension(30, 0),
+                    Top = new StyleDimension(height, 0),
+                    Width = new StyleDimension(0, 1),
+                    BackgroundColor = new Color(44 - 23 - 10, 57 - 23 - 5, 105 - 23, 178),
+                    BorderColor = Color.Transparent
+                };
+                ui.SetPadding(6);
+                var uiText = new UIText($"（暂无内容）")
+                {
+                    TextOriginY = 0.5f,
+                    TextColor = Color.Gray
+                };
+                ui.Append(uiText);
+                filePanel.Append(ui);
+                height += 30;
+
+            }
+
             filePanel.Height.Pixels = height + 6 * 2;
             if (filePanel.Children.Any())
             {

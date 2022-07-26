@@ -10,10 +10,9 @@ namespace _ReplaceString_.Package
         public static StringBuilder CacheInfo = new StringBuilder(10000);
         public static void UpdateTree(TreeNode oldRoot, TreeNode newRoot, TreeNode translation)
         {
-            Dictionary<string, bool> old;
             if (oldRoot.children.FirstOrDefault() is not Leaf)
             {
-                old = new Dictionary<string, bool>(
+                Dictionary<string, bool> old = new Dictionary<string, bool>(
                     oldRoot.children.Select(c => new KeyValuePair<string, bool>(c.name, false))
                     );
                 foreach (TreeNode child in newRoot.children)
@@ -35,30 +34,35 @@ namespace _ReplaceString_.Package
             }
             else
             {
-                var oldLeafs = oldRoot.children.Cast<Leaf>().ToList();
-                old = new Dictionary<string, bool>(oldLeafs.Select(c => new KeyValuePair<string, bool>(c.value, false)));
-
+                var oldLeafs = oldRoot.children.Cast<Leaf>().ToDictionary(l => l.name, l => l.value);
+                Dictionary<(string name, string value), bool> exist = new Dictionary<(string, string), bool>
+                    (oldLeafs.Select(c => new KeyValuePair<(string, string), bool>((c.Key, c.Value), false)));
+                (string name, string value) leaf;
                 foreach (Leaf child in newRoot.children.Cast<Leaf>())
                 {
-                    if (old.ContainsKey(child.value))
+                    if (exist.ContainsKey((child.name, child.value)))
                     {
-                        old[child.value] = true;
-                        string temp = (translation[oldLeafs.Where(pair => pair.value == child.value).First().name] as Leaf).value;
-                        oldLeafs.RemoveAt(oldLeafs.FindIndex(pair => pair.value == child.value));
-                        child.value = temp;
+                        exist[(child.name, child.value)] = true;
+                        child.value = (translation[child.name] as Leaf).value;
+                    }
+                    else if((leaf = exist.Keys.FirstOrDefault(k => k.name == child.name, (null, null))).name != null)
+                    {
+                        exist[(child.name, child.value)] = true;
+                        CacheInfo.AppendLine($"\tChanged Entry : {{");
+                        CacheInfo.AppendLine($"\t\tOld : {leaf.ToString().Replace("\n", "\n\t\t")}");
+                        CacheInfo.AppendLine($"\t\tNew : {child.ToString().Replace("\n", "\n\t\t")}");
                     }
                     else
                     {
-                        CacheInfo.AppendLine($"New Entry : ({child.name}, {child.value})");
+                        CacheInfo.AppendLine($"\tNew Entry : ({child.name}, {child.value})".Replace("\n", "\n\t"));
                     }
                 }
 
-                foreach (var value in old.Where(pair => !pair.Value).Select(pair => pair.Key))
+                foreach (var (key, value) in exist.Where(pair => !pair.Value).Select(pair => pair.Key))
                 {
-                    var name = oldLeafs.First(l => l.value == value).name;
-                    CacheInfo.AppendLine($"Missing Entry : ({name} : {value}) - ({translation[name]})");
-                    oldLeafs.RemoveAt(oldLeafs.FindIndex(l => l.value == value));
+                    CacheInfo.AppendLine($"Missing Entry : ({key} : {value}) - ({translation[key]})");
                 }
+              
             }
         }
 

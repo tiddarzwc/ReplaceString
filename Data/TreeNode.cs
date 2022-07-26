@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using _ReplaceString_.ConfigUI.Export;
+using _ReplaceString_.ConfigUI.B_Export;
 using Hjson;
 
 using Terraria.Localization;
@@ -86,16 +86,9 @@ namespace _ReplaceString_.Data
             if (this is not Leaf)
             {
                 sb.AppendLine(tab + name + ExportConfig.Space + ':' + ExportConfig.Space + '{');
-                foreach (var child in children)
+                foreach (var child in children.OrderBy(c => c.name))
                 {
-                    if (!ExportConfig.Tight)
-                    {
-                        sb.AppendLine(child.BuildHjson(depth + 1).ToString());
-                    }
-                    else
-                    {
-                        sb.Append(child.BuildHjson(depth + 1));
-                    }
+                    sb.Append(child.BuildHjson(depth + 1));
                 }
                 sb.AppendLine(tab + '}');
             }

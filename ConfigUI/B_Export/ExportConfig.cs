@@ -7,8 +7,9 @@ using MonoMod.RuntimeDetour;
 using Terraria.UI;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
+using _ReplaceString_.ConfigUI.Export;
 
-namespace _ReplaceString_.ConfigUI.Export;
+namespace _ReplaceString_.ConfigUI.B_Export;
 
 #pragma warning disable CS0649
 internal class ExportConfig : ModConfig

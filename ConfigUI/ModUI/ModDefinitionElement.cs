@@ -40,7 +40,7 @@ namespace _ReplaceString_.ConfigUI.ModUI
 
             Append(icon);
 
-            text = new UIText($"{info.displayName}({value.Name})")
+            text = new UIText($"{info.displayName} ({value.Name})")
             {
                 MarginLeft = MOD_HEIGHT,
                 TextColor = Color.White,

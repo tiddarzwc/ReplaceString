@@ -6,8 +6,9 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader.Config;
 
-namespace _ReplaceString_.ConfigUI.Load
+namespace _ReplaceString_.ConfigUI.A_Load
 {
+    [Label("LoadConfig")]
     public class LoadConfig : ModConfig
     {
         [Label("Autoload Mods")]

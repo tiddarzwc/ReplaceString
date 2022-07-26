@@ -6,8 +6,10 @@ using _ReplaceString_.Data;
 using _ReplaceString_.Package;
 using Hjson;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.Localization;
@@ -32,7 +34,7 @@ internal class MakeElement : ConfigElement
                 UIFocusInputTextFieldReplaced.instance.hintText = "Fliter Files";
             }
             UIFocusInputTextFieldReplaced.enable = true;
-            if(UIFocusInputTextFieldReplaced.TextChanged)
+            if (UIFocusInputTextFieldReplaced.TextChanged)
             {
                 ResetChildren();
             }
@@ -131,7 +133,7 @@ internal class MakeElement : ConfigElement
         panel2.Activate();
 
 
-        int margin = 30;
+        int margin = 30 + 6;
         foreach (var file in Directory.GetFiles($"{Main.SavePath}/Mods/ReplaceString")
             .Where(p => Path.GetExtension(p) == ".hjson")
             .Where(p => p.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
@@ -142,7 +144,9 @@ internal class MakeElement : ConfigElement
                 Height = new StyleDimension(40, 0),
                 MarginTop = margin,
                 Width = new StyleDimension(-16, 1),
-                MarginLeft = 8
+                MarginLeft = 8,
+                BackgroundColor = new Color(44 - 23 - 10, 57 - 23 - 5, 105 - 23, 178),
+                BorderColor = Color.Transparent
             };
             var fileName = new UIText(file)
             {
@@ -150,7 +154,7 @@ internal class MakeElement : ConfigElement
             };
             ui.OnMouseOver += (evt, listeningElement) =>
             {
-                ui.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
+                ui.BorderColor = Color.Gold;
                 if (fileName.TextColor == Color.White)
                 {
                     fileName.TextColor = Color.Yellow;
@@ -158,7 +162,7 @@ internal class MakeElement : ConfigElement
             };
             ui.OnMouseOut += (evt, listeningElement) =>
             {
-                ui.BackgroundColor = new Color(44, 57, 105, 178);
+                ui.BorderColor = Color.Transparent;
                 if (fileName.TextColor == Color.Yellow)
                 {
                     fileName.TextColor = Color.White;
@@ -189,12 +193,32 @@ internal class MakeElement : ConfigElement
             ui.Activate();
             Append(ui);
         }
-
+        if (Elements.Count == 2)
+        {
+            var ui = new UIPanel()
+            {
+                Height = new StyleDimension(40, 0),
+                MarginTop = margin,
+                Width = new StyleDimension(-16, 1),
+                MarginLeft = 8,
+                BackgroundColor = new Color(44 - 23 - 10, 57 - 23 - 5, 105 - 23, 178),
+                BorderColor = Color.Transparent
+            };
+            var uiText = new UIText("（暂无内容）")
+            {
+                HAlign = 0.5f,
+                TextColor = Color.Gray
+            };
+            margin += 40;
+            ui.Append(uiText);
+            ui.Activate();
+            Append(ui);
+        }
     }
 
     public override void Recalculate()
     {
-        Height.Pixels = 34 + (Elements.Count - 2) * 40;
+        Height.Pixels = 40 + (Elements.Count - 2) * 40;
         if (Parent != null)
         {
             Parent.Height.Pixels = Height.Pixels;
@@ -203,4 +227,15 @@ internal class MakeElement : ConfigElement
         base.Recalculate();
     }
 
+    protected override void DrawSelf(SpriteBatch spriteBatch)
+    {
+        CalculatedStyle dimensions = GetDimensions();
+        DrawPanel2(spriteBatch,
+            new Vector2(dimensions.X, dimensions.Y),
+            TextureAssets.SettingsPanel.Value,
+            (float)(dimensions.Width + 1f),
+            dimensions.Height,
+            new Color(44, 57, 105, 178)
+            );
+    }
 }

@@ -4,8 +4,12 @@ using _ReplaceString_.ConfigUI.Work;
 using _ReplaceString_.Data;
 using Hjson;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
+using Terraria.Audio;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 namespace _ReplaceString_.Translator.UI;
@@ -57,11 +61,14 @@ internal class UpdateElement : ConfigElement
             if (oldHjson.IsSelected && newHjson.IsSelected && transHjson.IsSelected)
             {
                 var path = $"{Main.SavePath}/Mods/ReplaceString/";
-                var o = TreeNode.ReadHjson(HjsonValue.Load(path + oldHjson.Text));
-                var n = TreeNode.ReadHjson(HjsonValue.Load(path + newHjson.Text));
-                var t = TreeNode.ReadHjson(HjsonValue.Load(path + transHjson.Text));
+                var o = TreeNode.ReadHjson(HjsonValue.Load(path + oldHjson.Text[2..]));
+                var n = TreeNode.ReadHjson(HjsonValue.Load(path + newHjson.Text[2..]));
+                var t = TreeNode.ReadHjson(HjsonValue.Load(path + transHjson.Text[2..]));
+                Package.Update.CacheInfo.Clear();
                 Package.Update.UpdateTree(o, n, t);
+                File.WriteAllText(path + $"{Path.GetFileNameWithoutExtension(newHjson.Text[2..])}-update.hjson", n.BuildHjson(0).ToString());
                 File.WriteAllText(path + "UpdateLog.txt", Package.Update.CacheInfo.ToString());
+                SoundEngine.PlaySound(SoundID.MenuOpen);
             }
         };
         Append(panel);
@@ -81,7 +88,7 @@ internal class UpdateElement : ConfigElement
 
         oldHjson = new FileSelectedUI("旧版本Hjson")
         {
-            Top = new StyleDimension(30, 0),
+            Top = new StyleDimension(30 + 6, 0),
             Left = new StyleDimension(8, 0),
             Width = new StyleDimension(-16, 1),
         };
@@ -95,7 +102,7 @@ internal class UpdateElement : ConfigElement
         };
         newHjson.OnUpdate += evt =>
         {
-            evt.Top.Pixels = oldHjson.Height.Pixels + oldHjson.Top.Pixels;
+            evt.Top.Pixels = oldHjson.Height.Pixels + oldHjson.Top.Pixels + 6;
         };
         Append(newHjson);
         newHjson.Activate();
@@ -107,7 +114,7 @@ internal class UpdateElement : ConfigElement
         };
         transHjson.OnUpdate += evt =>
         {
-            evt.Top.Pixels = newHjson.Top.Pixels + newHjson.Height.Pixels;
+            evt.Top.Pixels = newHjson.Top.Pixels + newHjson.Height.Pixels + 6;
         };
         Append(transHjson);
         transHjson.Activate();
@@ -115,7 +122,7 @@ internal class UpdateElement : ConfigElement
 
     public override void Recalculate()
     {
-        float h = 30 + 8;
+        float h = 10 + 8 + 18;
         foreach (var child in Elements)
         {
             h += child.Height.Pixels;
@@ -126,5 +133,17 @@ internal class UpdateElement : ConfigElement
             Parent.Height.Pixels = Height.Pixels;
         }
         base.Recalculate();
+    }
+
+    protected override void DrawSelf(SpriteBatch spriteBatch)
+    {
+        CalculatedStyle dimensions = GetDimensions();
+        DrawPanel2(spriteBatch,
+            new Vector2(dimensions.X, dimensions.Y),
+            TextureAssets.SettingsPanel.Value,
+            (float)(dimensions.Width + 1f),
+            dimensions.Height,
+            new Color(44, 57, 105, 178)
+            );
     }
 }
