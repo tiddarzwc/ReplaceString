@@ -80,7 +80,7 @@ namespace _ReplaceString_.ConfigUI.ModUI
             Elements.Clear();
             foreach (var mod in Value.Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) || mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())).OrderBy(mod => mod.DisplayName))
             {
-                var ui = new ModDefinitionElement(mod)
+                var ui = new ModDefinitionElement(mod, true)
                 {
                     MarginLeft = 8,
                     MarginTop = MOD_HEIGHT * Elements.Count + TEXT_HEIGHT,

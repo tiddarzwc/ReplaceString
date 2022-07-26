@@ -68,7 +68,7 @@ namespace _ReplaceString_.Package
                 hookList.Add(name, new List<ILHook>());
             }
             oldTree = new TreeNode(name);
-            Export.GetLdstr(oldTree, name, asmBytes);
+            Export.GetLdstr(oldTree, asmBytes);
             AddMapEntry(Language.ActiveCulture);
             AddLdstrAndPath();
         }
@@ -163,7 +163,7 @@ namespace _ReplaceString_.Package
         }
 
         public Dictionary<string, MethodBase> methods = new Dictionary<string, MethodBase>();
-        public Dictionary<string, MethodBase> methodsPath = new Dictionary<string, MethodBase>();
+        //public Dictionary<string, MethodBase> methodsPath = new Dictionary<string, MethodBase>();
         public static ILHookConfig config = new ILHookConfig()
         {
             ManualApply = false
@@ -171,7 +171,7 @@ namespace _ReplaceString_.Package
         public void AddLdstrAndPath()
         {
             var ldstr = root["Ldstr"];
-            var path = root["Path"];
+            //var path = root["Path"];
             foreach (var type in assembly.DefinedTypes)
             {
                 foreach (var method in type.DeclaredMethods)
@@ -179,35 +179,29 @@ namespace _ReplaceString_.Package
                     string methodName = method.Name.Replace("get_", "").Replace(".", "").Replace("|", "");
                     if (type.DeclaredMethods.Count(m => m.Name == method.Name) > 1)
                     {
-                        foreach (var p in method.GetParameters())
-                        {
-                            methodName += '_' + p.ParameterType.Name.Replace("[", "").Replace(",", "").Replace("]", "s").Replace("&", "Ref");
-                        }
+                        methodName = UUtils.GetSpecialMethodName(method);
                     }
                     methods.Add($"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
-                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    //methodsPath.Add($"{type.FullName.Replace('.', '_')}_{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
                 }
                 foreach (var method in type.DeclaredConstructors)
                 {
                     string methodName = method.Name.Replace("get_", "").Replace(".", "").Replace("|", "");
-                    if (type.DeclaredMethods.Count(m => m.Name == method.Name) > 1)
+                    if (type.DeclaredConstructors.Count(m => m.Name == method.Name) > 1)
                     {
-                        foreach (var p in method.GetParameters())
-                        {
-                            methodName += '_' + p.ParameterType.Name.Replace("[", "").Replace(",", "").Replace("]", "s").Replace("&", "Ref");
-                        }
+                        methodName = UUtils.GetSpecialMethodName(method);
                     }
                     methods.Add($"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
-                    methodsPath.Add($"{type.FullName.Replace('.', '_')}_{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
+                    //methodsPath.Add($"{type.FullName.Replace('.', '_')}_{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_"), method);
                 }
             }
             var oldstr = oldTree["Ldstr"];
-            var oldpath = oldTree["Path"];
+            //var oldpath = oldTree["Path"];
             for (int i = 0; i < ldstr.children.Count; i++)
             {
                 AddLdstr(ldstr.children[i], oldstr.children[i], string.Empty);
             }
-            AddPath(path, oldpath);
+            //AddPath(path, oldpath);
         }
 
         private void AddLdstr(TreeNode current, TreeNode old, string fullname)
@@ -266,52 +260,52 @@ namespace _ReplaceString_.Package
             }
         }
 
-        private void AddPath(TreeNode current, TreeNode old)
-        {
-            Queue<(string oldString, string newString)> replace = new Queue<(string oldString, string newString)>();
-            Queue<MethodBase> replacedMethod = new Queue<MethodBase>();
-            var it = old.children.Where(c => c is Leaf).GetEnumerator();
-            MethodBase method = null;
-            foreach (Leaf child in current.children.Where(c => c is Leaf))
-            {
-                if (!it.MoveNext())
-                {
-                    throw new Exception("Invalid path add");
-                }
-                var leaf = it.Current as Leaf;
-                if (child.GetRealValue() != leaf.GetRealValue())
-                {
-                    for (int i = child.name.Length - 1; i >= 0; --i)
-                    {
-                        if (child.name[i] == '_')
-                        {
-                            var t = methodsPath[child.name[0..i]];
-                            if (method != t)
-                            {
-                                replacedMethod.Enqueue(t);
-                            }
+        //private void AddPath(TreeNode current, TreeNode old)
+        //{
+        //    Queue<(string oldString, string newString)> replace = new Queue<(string oldString, string newString)>();
+        //    Queue<MethodBase> replacedMethod = new Queue<MethodBase>();
+        //    var it = old.children.Where(c => c is Leaf).GetEnumerator();
+        //    MethodBase method = null;
+        //    foreach (Leaf child in current.children.Where(c => c is Leaf))
+        //    {
+        //        if (!it.MoveNext())
+        //        {
+        //            throw new Exception("Invalid path add");
+        //        }
+        //        var leaf = it.Current as Leaf;
+        //        if (child.GetRealValue() != leaf.GetRealValue())
+        //        {
+        //            for (int i = child.name.Length - 1; i >= 0; --i)
+        //            {
+        //                if (child.name[i] == '_')
+        //                {
+        //                    var t = methodsPath[child.name[0..i]];
+        //                    if (method != t)
+        //                    {
+        //                        replacedMethod.Enqueue(t);
+        //                    }
 
-                            replace.Enqueue((leaf.value, child.value));
-                            break;
-                        }
-                    }
-                }
-            }
-            while (replacedMethod.Count > 0)
-            {
-                method = replacedMethod.Dequeue();
-                hookList[name].Add(new ILHook(method, il =>
-                {
-                    foreach (var ins in il.Instrs)
-                    {
-                        if (ins.OpCode == OpCodes.Ldstr && ins.Operand.ToString() == replace.Peek().oldString)
-                        {
-                            ins.Operand = replace.Dequeue().newString;
-                        }
-                    }
-                }, ref config));
-            }
-        }
+        //                    replace.Enqueue((leaf.value, child.value));
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    while (replacedMethod.Count > 0)
+        //    {
+        //        method = replacedMethod.Dequeue();
+        //        hookList[name].Add(new ILHook(method, il =>
+        //        {
+        //            foreach (var ins in il.Instrs)
+        //            {
+        //                if (ins.OpCode == OpCodes.Ldstr && ins.Operand.ToString() == replace.Peek().oldString)
+        //                {
+        //                    ins.Operand = replace.Dequeue().newString;
+        //                }
+        //            }
+        //        }, ref config));
+        //    }
+        //}
 
     }
 }

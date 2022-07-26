@@ -108,7 +108,7 @@ internal class ExportElement : ConfigElement<object>
             .Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) ||
             mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())))
         {
-            var ui = new ModDefinitionElement(new ModDefinition(mod.Name, mod.DisplayName))
+            var ui = new ModDefinitionElement(new ModDefinition(mod.Name, mod.DisplayName), false)
             {
                 MarginLeft = 8,
                 MarginTop = height,

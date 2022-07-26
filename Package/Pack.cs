@@ -374,34 +374,34 @@ namespace _ReplaceString_.Package
                 PackupLdstr($"{path}/Ldstr", root["Ldstr"]);
             }
 
-            var pathNode = root["Path"];
-            using (file = new FileStream($"{path}/Path.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
+            //var pathNode = root["Path"];
+            //using (file = new FileStream($"{path}/Path.txt", FileMode.Open))
+            //{
+            //    using (reader = new StreamReader(file))
+            //    {
+            //        while ((line = reader.ReadLine()) != null)
+            //        {
+            //            if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
+            //            {
+            //                continue;
+            //            }
+            //            begin = true;
+            //            key = line.Split(':')[0].Trim('\t', ' ');
+            //            while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
 
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        pathNode += new Leaf(key, value);
-                    }
-                }
-            }
+            //            value = line[(line.IndexOf(':') + 1)..].Trim();
+            //            if (string.IsNullOrWhiteSpace(value))
+            //            {
+            //                while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
+            //                {
+            //                    value += (begin ? "" : "\n") + line;
+            //                    begin = false;
+            //                }
+            //            }
+            //            pathNode += new Leaf(key, value);
+            //        }
+            //    }
+            //}
 
 
             return (root, config);

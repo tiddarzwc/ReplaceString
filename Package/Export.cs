@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using _ReplaceString_.Data;
 using Mono.Cecil;
@@ -70,10 +69,10 @@ internal class Export
         GetMapEntry();
         GetLdstr();
     }
-    public static void GetLdstr(TreeNode root, string name, byte[] asmBytes)
+    public static void GetLdstr(TreeNode root, byte[] asmBytes)
     {
         var ldstr = new TreeNode("Ldstr");
-        var path = new TreeNode("Path");
+        //var path = new TreeNode("Path");
         var asm = AssemblyDefinition.ReadAssembly(new MemoryStream(asmBytes));
         var module = asm.MainModule;
         TreeNode current = ldstr;
@@ -81,53 +80,47 @@ internal class Export
         {
             foreach (var method in type.Methods.Where(m => !m.IsAbstract && m.HasBody))
             {
-                int pathCount = 0;
+                //int pathCount = 0;
                 int count = 0;
-                foreach (var instr in method.Body.Instructions)
+                foreach (var instr in method.Body.Instructions.Where(ins => ins.OpCode == OpCodes.Ldstr))
                 {
-                    if (instr.OpCode == OpCodes.Ldstr)
+                    switch (IsValid(instr))
                     {
-                        switch (IsValid(instr, name))
-                        {
-                            case CheckResult.True:
-                                string methodName = method.Name.Replace("get_", "").Replace(".", "").Replace("|", "");
-                                if (type.Methods.Count(m => m.Name == method.Name) > 1)
+                        case CheckResult.True:
+                            string methodName = method.Name.Replace("get_", "").Replace(".", "").Replace("|", "");
+                            if (type.Methods.Count(m => m.Name == method.Name) > 1)
+                            {
+                                methodName = UUtils.GetSpecialMethodName(method);
+                            }
+                            string[] key = $"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_").Split('.');
+                            if (key.Length > 0)
+                            {
+                                for (int i = 0; i < key.Length; i++)
                                 {
-                                    foreach (var p in method.Parameters)
-                                    {
-                                        methodName += '_' + p.ParameterType.Name.Replace("[", "").Replace(",", "").Replace("]", "s").Replace("&", "Ref");
-                                    }
+                                    current = current[key[i]];
                                 }
-                                string[] key = $"{type.FullName}.{methodName}".Replace("<", "").Replace(">", "").Replace("`", "_").Split('.');
-                                if (key.Length > 0)
-                                {
-                                    for (int i = 0; i < key.Length; i++)
-                                    {
-                                        current = current[key[i]];
-                                    }
-                                    current += new Leaf($"{count}", instr.Operand.ToString());
-                                }
-                                current = ldstr;
-                                break;
-                            case CheckResult.False:
-                                break;
-                            case CheckResult.Path:
-                                path += new Leaf($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}_{pathCount++}".Replace("<", "").Replace(">", "").Replace("`", "_"), instr.Operand.ToString());
-                                break;
-                            default:
-                                break;
-                        }
-                        ++count;
+                                current += new Leaf($"{count}", instr.Operand.ToString());
+                            }
+                            current = ldstr;
+                            break;
+                        case CheckResult.False:
+                            break;
+                        //case CheckResult.Path:
+                        //    path += new Leaf($"{type.FullName.Replace('.', '_')}_{method.Name.Replace("get_", "").Replace(".", "")}_{pathCount++}".Replace("<", "").Replace(">", "").Replace("`", "_"), instr.Operand.ToString());
+                        //    break;
+                        default:
+                            break;
                     }
+                    ++count;
                 }
             }
         }
         root += ldstr;
-        root += path;
+        //root += path;
     }
     public void GetLdstr()
     {
-        GetLdstr(head, mod.Name, mod.GetValue<TmodFile>("File").GetModAssembly());
+        GetLdstr(head, mod.GetValue<TmodFile>("File").GetModAssembly());
     }
     public void GetMapEntry()
     {
@@ -176,7 +169,7 @@ internal class Export
         using StreamWriter writer = new StreamWriter(stream);
         writer.Write(head.BuildHjson(0));
     }
-    public static CheckResult IsValid(Instruction ins, string modName)
+    public static CheckResult IsValid(Instruction ins)
     {
         string operand = ins.Operand.ToString();
         if (operand.Trim('\t', ' ') == string.Empty)
@@ -193,18 +186,19 @@ internal class Export
             }
         }
 
-        if (!Path.GetInvalidPathChars().Any(c => operand.Contains(c)))
-        {
-            int count = operand.Count(ch => ch == '/' || ch == '\\');
-            if (count > 0 && (ModLoader.Mods.Any(mod => operand.StartsWith(modName)) || operand.StartsWith("Terraria")))
-            {
-                return CheckResult.Path;
-            }
-            else if (count > 1)
-            {
-                return CheckResult.Path;
-            }
-        }
+        //不搞路径了，太麻烦了！
+        //if (!Path.GetInvalidPathChars().Any(c => operand.Contains(c)))
+        //{
+        //    int count = operand.Count(ch => ch == '/' || ch == '\\');
+        //    if (count > 0 && (ModLoader.Mods.Any(mod => operand.StartsWith(modName)) || operand.StartsWith("Terraria")))
+        //    {
+        //        return CheckResult.Path;
+        //    }
+        //    else if (count > 1)
+        //    {
+        //        return CheckResult.Path;
+        //    }
+        //}
         return CheckResult.True;
     }
 }
@@ -212,6 +206,7 @@ internal class Export
 public enum CheckResult
 {
     True,
-    False,
-    Path
+    False
+    //摆烂了！
+    //Path
 }

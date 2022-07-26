@@ -251,23 +251,23 @@ namespace _ReplaceString_.Package
                 }
             }
 
-            var pathNode = root["Path"];
-            using (file = new FileStream($"{path}/Path.txt", FileMode.Create))
-            {
-                using (writer = new StreamWriter(file))
-                {
-                    foreach (var leaf in pathNode.children.Select(c => c as Leaf))
-                    {
-                        sb.Clear();
-                        sb.AppendLine($"{leaf.name} :");
-                        sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine("}");
-                        writer.WriteLine(sb);
-                    }
-                }
-            }
+            //var pathNode = root["Path"];
+            //using (file = new FileStream($"{path}/Path.txt", FileMode.Create))
+            //{
+            //    using (writer = new StreamWriter(file))
+            //    {
+            //        foreach (var leaf in pathNode.children.Select(c => c as Leaf))
+            //        {
+            //            sb.Clear();
+            //            sb.AppendLine($"{leaf.name} :");
+            //            sb.AppendLine("{");
+            //            sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+            //            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+            //            sb.AppendLine("}");
+            //            writer.WriteLine(sb);
+            //        }
+            //    }
+            //}
 
             if (config.LdstrFold)
             {

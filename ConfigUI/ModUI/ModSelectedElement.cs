@@ -24,7 +24,7 @@ namespace _ReplaceString_.ConfigUI.ModUI
             Elements.Clear();
             foreach (var (mod, info) in ModList.GetUnAddedMod().OrderBy(mod => mod.Key))
             {
-                var ui = new ModDefinitionElement(new ModDefinition(mod, info.displayName))
+                var ui = new ModDefinitionElement(new ModDefinition(mod, info.displayName), false)
                 {
                     MarginLeft = 8,
                     MarginTop = MOD_HEIGHT * Elements.Count + TEXT_HEIGHT,

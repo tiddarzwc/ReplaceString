@@ -41,13 +41,12 @@ public class ReplaceString : Mod
         hooks = new List<Hook>();
         ilHooks = new List<ILHook>();
         Import import = null;
-        bool hasReplace = false;
         string logPath = $"{Main.SavePath}/Mods/ReplaceString/log.txt";
         #region ConfigLoad
         LoadConfig config = new LoadConfig();
         try
         {
-            string path = $"{Main.SavePath}/ModConfigs/_ReplaceString__ReplaceStringConfig.json";
+            string path = $"{Main.SavePath}/ModConfigs/_ReplaceString__LoadConfig.json";
             string json = File.Exists(path) ? File.ReadAllText(path) : "{}";
             JsonConvert.PopulateObject(json, config);
         }
@@ -79,7 +78,7 @@ public class ReplaceString : Mod
                     return;
                 }
                 importStates[name] = ImportState.Success;
-                string fileName = $"{Main.SavePath}/Mods/ReplaceString/{name}_{Language.ActiveCulture.Name}.hjson";
+                string fileName = $"{Main.SavePath}/Mods/ReplaceString/{name}-{Language.ActiveCulture.Name}.hjson";
                 if (!File.Exists(fileName))
                 {
                     importStates[name] = ImportState.HjsonNotExist;
@@ -110,7 +109,6 @@ public class ReplaceString : Mod
                         File.AppendAllText(logPath, $"PreModLoad Fail\nException : {ex}\n");
                     }
                 }
-                hasReplace = true;
             });
         }));
         #endregion
@@ -119,7 +117,7 @@ public class ReplaceString : Mod
         hooks.Add(new Hook(typeof(Mod).GetMethod("Autoload", BindingFlags.Instance | BindingFlags.NonPublic), (Autoload orig, Mod mod) =>
         {
             orig(mod);
-            if (hasReplace && importStates[mod.Name] == ImportState.Success)
+            if (importStates.ContainsKey(mod.Name) && importStates[mod.Name] == ImportState.Success)
             {
                 try
                 {
