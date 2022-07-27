@@ -1,4 +1,7 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using _ReplaceString_.ConfigUI.Work;
@@ -6,444 +9,210 @@ using _ReplaceString_.Data;
 
 namespace _ReplaceString_.Package
 {
+    internal class CacheReader : StreamReader
+    {
+        public CacheReader(Stream stream) : base(stream)
+        {
+        }
+
+        public CacheReader(string path) : base(path)
+        {
+        }
+
+        public CacheReader(Stream stream, bool detectEncodingFromByteOrderMarks) : base(stream, detectEncodingFromByteOrderMarks)
+        {
+        }
+
+        public CacheReader(Stream stream, Encoding encoding) : base(stream, encoding)
+        {
+        }
+
+        public CacheReader(string path, FileStreamOptions options) : base(path, options)
+        {
+        }
+
+        public CacheReader(string path, bool detectEncodingFromByteOrderMarks) : base(path, detectEncodingFromByteOrderMarks)
+        {
+        }
+
+        public CacheReader(string path, Encoding encoding) : base(path, encoding)
+        {
+        }
+
+        public CacheReader(Stream stream, Encoding encoding, bool detectEncodingFromByteOrderMarks) : base(stream, encoding, detectEncodingFromByteOrderMarks)
+        {
+        }
+
+        public CacheReader(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks) : base(path, encoding, detectEncodingFromByteOrderMarks)
+        {
+        }
+
+        public CacheReader(Stream stream, Encoding encoding, bool detectEncodingFromByteOrderMarks, int bufferSize) : base(stream, encoding, detectEncodingFromByteOrderMarks, bufferSize)
+        {
+        }
+
+        public CacheReader(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks, int bufferSize) : base(path, encoding, detectEncodingFromByteOrderMarks, bufferSize)
+        {
+        }
+
+        public CacheReader(string path, Encoding encoding, bool detectEncodingFromByteOrderMarks, FileStreamOptions options) : base(path, encoding, detectEncodingFromByteOrderMarks, options)
+        {
+        }
+
+        public CacheReader(Stream stream, Encoding encoding = null, bool detectEncodingFromByteOrderMarks = true, int bufferSize = -1, bool leaveOpen = false) : base(stream, encoding, detectEncodingFromByteOrderMarks, bufferSize, leaveOpen)
+        {
+        }
+        private string cache = null;
+        private bool useCache = false;
+        public override string ReadLine()
+        {
+            if (useCache)
+            {
+                useCache = false;
+                return cache;
+            }
+            return cache = base.ReadLine();
+        }
+        public void RollBack() => useCache = true;
+    }
     internal static class Pack
     {
         public static MakeConfig config;
+        public static string ReadValue(CacheReader reader, string symbol, string startWith)
+        {
+            string line, value;
+            bool firstRead = true;
+            while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith(symbol)) { }
+
+            value = line[(line.IndexOf(':') + 1)..].Trim();
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                while ((line = reader.ReadLine()).StartsWith(startWith))
+                {
+                    value += (firstRead ? "" : "\n") + line[3..];
+                    firstRead = false;
+                }
+                reader.RollBack();
+            }
+            return value;
+        }
+        public static Regex regex = new Regex("[a-zA-Z0-9]", RegexOptions.Compiled);
+        public static bool ReadKey(CacheReader reader, out string key)
+        {
+            string line = reader.ReadLine();
+            if (line == null || !regex.IsMatch(line))
+            {
+                key = null;
+                return false;
+            }
+            key = line.Split(':')[0].Trim('\t', ' ');
+            return true;
+        }
+        public static void ReadFile(string path, TreeNode root, params string[] args)
+        {
+            string value, oldValue;
+            TreeNode[] nodes = args.Select(a => new TreeNode(a)).ToArray();
+            using FileStream file = new FileStream(path, FileMode.Open);
+            using CacheReader reader = new CacheReader(file);
+            string startWith = "\t\t";
+            while (!reader.EndOfStream)
+            {
+                if (!ReadKey(reader, out string key))
+                {
+                    continue;
+                }
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args.Length > 1)
+                    {
+                        startWith += '\t';
+                        while (!ReadKey(reader, out _)) { }
+                    }
+                    oldValue = ReadValue(reader, "Origin :", startWith);
+                    value = ReadValue(reader, "Current :", startWith);
+                    if (oldValue != value && !string.IsNullOrWhiteSpace(value))
+                    {
+                        nodes[i] += new Leaf($"{config.ModName}.{args[i]}.{key}", value);
+                    }
+                }
+            }
+            foreach (var node in nodes)
+            {
+                root += node;
+            }
+        }
         public static (TreeNode root, MakeConfig config) Packup(string path)
         {
-            FileStream file;
-            StreamReader reader;
-            using (file = new FileStream($"{path}/Config.json", FileMode.Open))
+            using (FileStream file = new FileStream($"{path}/Config.json", FileMode.Open))
             {
                 config = JsonSerializer.Deserialize<MakeConfig>(file);
             }
 
             TreeNode root = new TreeNode(config.ModName);
-            string line;
-            bool begin;
-            var item = root["ItemName"];
-            var tooltip = root["ItemTooltip"];
-            string key;
-            string value;
-            using (file = new FileStream($"{path}/Item.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        item += new Leaf($"{config.ModName}.ItemName.{key}", value);
-
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        tooltip += new Leaf($"{config.ModName}.ItemTooltip.{key}", value);
-                    }
-                }
-            }
-
-            var proj = root["ProjectileName"];
-            using (file = new FileStream($"{path}/Projectile.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        proj += new Leaf($"{config.ModName}.ProjectileName.{key}", value);
-                    }
-                }
-            }
-
-            var damage = root["DamageClassName"];
-            using (file = new FileStream($"{path}/DamageClass.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        damage += new Leaf($"{config.ModName}.DamageClassName.{key}", value);
-                    }
-                }
-            }
-
-            var info = root["InfoDisplayName"];
-            using (file = new FileStream($"{path}/InfoDisplay.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        info += new Leaf($"{config.ModName}.InfoDisplayName.{key}", value);
-                    }
-                }
-            }
-
-            var biome = root["BiomeName"];
-            using (file = new FileStream($"{path}/Biome.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        biome += new Leaf($"{config.ModName}.BiomeName.{key}", value);
-                    }
-                }
-            }
-
-
-            var buff = root["BuffName"];
-            var description = root["BuffDescription"];
-            using (file = new FileStream($"{path}/Buff.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        buff += new Leaf($"{config.ModName}.BuffName.{key}", value);
-
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        description += new Leaf($"{config.ModName}.BuffDescription.{key}", value);
-                    }
-                }
-            }
-
-            var npc = root["NPCName"];
-            using (file = new FileStream($"{path}/NPC.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        npc += new Leaf($"{config.ModName}.NPCName.{key}", value);
-                    }
-                }
-            }
-
-            var prefix = root["Prefix"];
-            using (file = new FileStream($"{path}/Prefix.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        prefix += new Leaf($"{config.ModName}.Prefix.{key}", value);
-                    }
-                }
-            }
-
-            var containers = root["Containers"];
-            using (file = new FileStream($"{path}/Containers.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        containers += new Leaf($"{config.ModName}.Containers.{key}", value);
-                    }
-                }
-            }
+            ReadFile($"{path}/Item.txt", root, "ItemName", "ItemTooltip");
+            ReadFile($"{path}/Projectile.txt", root, "ProjectileName");
+            ReadFile($"{path}/DamageClass.txt", root, "DamageClassName");
+            ReadFile($"{path}/InfoDisplay.txt", root, "InfoDisplayName");
+            ReadFile($"{path}/Biome.txt", root, "BiomeName");
+            ReadFile($"{path}/Buff.txt", root, "BuffName", "BuffDescription");
+            ReadFile($"{path}/NPC.txt", root, "NPCName");
+            ReadFile($"{path}/Prefix.txt", root, "Prefix");
+            ReadFile($"{path}/Containers.txt", root, "Containers");
 
             var map = root["MapEntry"];
-            var tile = map["tileEntries"];
-            using (file = new FileStream($"{path}/TileEntries.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
+            ReadFile($"{path}/TileEntries.txt", map, "tileEntries");
+            ReadFile($"{path}/WallEntries.txt", map, "wallEntries");
 
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        tile += new Leaf(key, value);
-                    }
-                }
-            }
+            PackupLdstr($"{path}/Ldstr", root["Ldstr"]);
 
-            var wall = map["wallEntries"];
-            using (file = new FileStream($"{path}/WallEntries.txt", FileMode.Open))
-            {
-                using (reader = new StreamReader(file))
-                {
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-                        {
-                            continue;
-                        }
-                        begin = true;
-                        key = line.Split(':')[0].Trim('\t', ' ');
-                        while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                        value = line[(line.IndexOf(':') + 1)..].Trim();
-                        if (string.IsNullOrWhiteSpace(value))
-                        {
-                            while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                            {
-                                value += (begin ? "" : "\n") + line;
-                                begin = false;
-                            }
-                        }
-                        wall += new Leaf(key, value);
-                    }
-                }
-            }
-            if (config.LdstrFold)
-            {
-                PackupLdstr($"{path}/Ldstr", root["Ldstr"]);
-            }
-
-            //var pathNode = root["Path"];
-            //using (file = new FileStream($"{path}/Path.txt", FileMode.Open))
-            //{
-            //    using (reader = new StreamReader(file))
-            //    {
-            //        while ((line = reader.ReadLine()) != null)
-            //        {
-            //            if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
-            //            {
-            //                continue;
-            //            }
-            //            begin = true;
-            //            key = line.Split(':')[0].Trim('\t', ' ');
-            //            while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-            //            value = line[(line.IndexOf(':') + 1)..].Trim();
-            //            if (string.IsNullOrWhiteSpace(value))
-            //            {
-            //                while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-            //                {
-            //                    value += (begin ? "" : "\n") + line;
-            //                    begin = false;
-            //                }
-            //            }
-            //            pathNode += new Leaf(key, value);
-            //        }
-            //    }
-            //}
-
+            CullEmpty(root);
 
             return (root, config);
         }
-
         private static void PackupLdstr(string path, TreeNode node)
         {
-            var dir = Directory.GetDirectories(path);
-            var file = Directory.GetFiles(path);
-            foreach (var d in dir)
+            var dirs = Directory.GetDirectories(path);
+            var files = Directory.GetFiles(path);
+            foreach (var dir in dirs)
             {
-                PackupLdstr(d, node[d.Split('\\')[^1]]);
+                PackupLdstr(dir, node[dir.Split('\\')[^1]]);
             }
 
-            foreach (var f in file)
+            foreach (var file in files)
             {
-                bool begin;
-                var child = node[Path.GetFileNameWithoutExtension(f.Split('\\')[^1])];
-                string key, line, value;
-                using var reader = File.OpenText(f);
-                while ((line = reader.ReadLine()) != null)
+                var child = node[Path.GetFileNameWithoutExtension(file.Split('\\')[^1])];
+                string value, oldValue;
+                using var reader = new CacheReader(File.OpenRead(file));
+                while (!reader.EndOfStream)
                 {
-                    if (!Regex.IsMatch(line, "[a-zA-Z0-9]"))
+                    if (!ReadKey(reader, out string key))
                     {
                         continue;
                     }
-                    begin = true;
-                    key = line.Split(':')[0].Trim('\t', ' ');
-                    while (!(line = reader.ReadLine().TrimStart('\t', ' ')).StartsWith("Current :")) { }
-
-                    value = line[(line.IndexOf(':') + 1)..].Trim();
-                    if (string.IsNullOrWhiteSpace(value))
+                    Debug.Assert(int.TryParse(key.Split(':')[0], out _));
+                    oldValue = ReadValue(reader, "Origin :", "\t\t");
+                    value = ReadValue(reader, "Current :", "\t\t");
+                    if (oldValue != value && !string.IsNullOrWhiteSpace(value))
                     {
-                        while ((line = reader.ReadLine().TrimStart('\t', ' ')) != "}")
-                        {
-                            value += (begin ? "" : "\n") + line;
-                            begin = false;
-                        }
+                        child += new Leaf(key, value);
                     }
-                    child += new Leaf(key, value);
                 }
             }
+        }
+        public static bool CullEmpty(TreeNode root)
+        {
+            for (int i = 0; i < root.children.Count; i++)
+            {
+                if(CullEmpty(root.children[i]))
+                {
+                    root.children.RemoveAt(i--);
+                }
+            }
+            if (root.children.Count == 0 && root is not Leaf)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

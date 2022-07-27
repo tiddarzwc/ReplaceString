@@ -76,47 +76,56 @@ namespace _ReplaceString_.Package
         {
             AddTranslation(Language.ActiveCulture);
         }
+        public static void TryAddTranslation(ModTranslation trans, TreeNode root, string name, GameCulture culture)
+        {
+            //用字典查找好一点……但是摸了
+            var result = root.children.Find(t => t.name == name);
+            if(result != null)
+            {
+                trans.AddTranslation(culture, (result as Leaf).value);
+            }
+        }
         public void AddTranslation(GameCulture culture)
         {
             foreach (var t in ModContent.GetContent<IModType>().Where(m => m.Mod.Name == name))
             {
                 if (t is ModItem modItem)
                 {
-                    modItem.DisplayName.AddTranslation(culture, (root["ItemName"][t.Name] as Leaf).value);
-                    modItem.Tooltip.AddTranslation(culture, (root["ItemTooltip"][t.Name] as Leaf).value);
+                    TryAddTranslation(modItem.DisplayName, root["ItemName"], t.Name, culture);
+                    TryAddTranslation(modItem.Tooltip, root["ItemTooltip"], t.Name, culture);
                 }
                 else if (t is ModProjectile modProj)
                 {
-                    modProj.DisplayName.AddTranslation(culture, (root["ProjectileName"][modProj.Name] as Leaf).value);
+                    TryAddTranslation(modProj.DisplayName, root["ProjectileName"], t.Name, culture);
                 }
                 else if (t is DamageClass damage)
                 {
-                    damage.ClassName.AddTranslation(culture, (root["DamageClassName"][damage.Name] as Leaf).value);
+                    TryAddTranslation(damage.ClassName, root["DamageClassName"], t.Name, culture);
                 }
                 else if (t is InfoDisplay info)
                 {
-                    info.InfoName.AddTranslation(culture, (root["InfoDisplayName"][info.Name] as Leaf).value);
+                    TryAddTranslation(info.InfoName, root["InfoDisplayName"], t.Name, culture);
                 }
                 else if (t is ModBiome modBiome)
                 {
-                    modBiome.DisplayName.AddTranslation(culture, (root["BiomeName"][modBiome.Name] as Leaf).value);
+                    TryAddTranslation(modBiome.DisplayName, root["BiomeName"], t.Name, culture);
                 }
                 else if (t is ModBuff modBuff)
                 {
-                    modBuff.DisplayName.AddTranslation(culture, (root["BuffName"][modBuff.Name] as Leaf).value);
-                    modBuff.Description.AddTranslation(culture, (root["BuffDescription"][modBuff.Name] as Leaf).value);
+                    TryAddTranslation(modBuff.DisplayName, root["BuffName"], t.Name, culture);
+                    TryAddTranslation(modBuff.Description, root["BuffDescription"], t.Name, culture);
                 }
                 else if (t is ModNPC modNPC)
                 {
-                    modNPC.DisplayName.AddTranslation(culture, (root["NPCName"][modNPC.Name] as Leaf).value);
+                    TryAddTranslation(modNPC.DisplayName, root["NPCName"], t.Name, culture);
                 }
                 else if (t is ModPrefix modPrefix)
                 {
-                    modPrefix.DisplayName.AddTranslation(culture, (root["Prefix"][modPrefix.Name] as Leaf).value);
+                    TryAddTranslation(modPrefix.DisplayName, root["Prefix"], t.Name, culture);
                 }
                 else if (t is ModTile modTile)
                 {
-                    modTile.ContainerName.AddTranslation(culture, (root["Containers"][modTile.Name] as Leaf).value);
+                    TryAddTranslation(modTile.ContainerName, root["Containers"], t.Name, culture);
                 }
             }
         }
@@ -149,11 +158,11 @@ namespace _ReplaceString_.Package
                         {
                             if (count++ == 0)
                             {
-                                trans.AddTranslation(culture, (root[tile.Name] as Leaf).value);
+                                TryAddTranslation(trans, root, tile.Name, culture);
                             }
                             else
                             {
-                                trans.AddTranslation(culture, (root[$"{tile.Name}_{count}"] as Leaf).value);
+                                TryAddTranslation(trans, root, $"{tile.Name}_{count}", culture);
                             }
                         }
                     }

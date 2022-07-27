@@ -269,10 +269,7 @@ namespace _ReplaceString_.Package
             //    }
             //}
 
-            if (config.LdstrFold)
-            {
-                SetupLdstrFolds(root["Ldstr"], path);
-            }
+            SetupLdstrFolds(root["Ldstr"], path);
 
             return path;
         }

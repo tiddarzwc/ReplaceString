@@ -76,7 +76,7 @@ internal class MakeElement : ConfigElement
                     Make.SetupFolds(TreeNode.ReadHjson(HjsonValue.Load(file)),
                         new MakeConfig(Path.GetFileName(path).Split('-')[0],
                         (int)(GameCulture.CultureName)typeof(GameCulture.CultureName).GetEnumValues().Cast<object>().First(c => c.ToString() == ModContent.GetInstance<WorkConfig>().culture),
-                        true, ModContent.GetInstance<WorkConfig>().ignoreSpace));
+                        ModContent.GetInstance<WorkConfig>().ignoreSpace));
                 }
                 else
                 {

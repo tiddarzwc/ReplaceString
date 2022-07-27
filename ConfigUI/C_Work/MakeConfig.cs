@@ -8,17 +8,15 @@ namespace _ReplaceString_.ConfigUI.Work
 {
     internal class MakeConfig
     {
-        public MakeConfig(string modName, int targetCultureID, bool ldstrFold, bool ignoreEmpty)
+        public MakeConfig(string modName, int targetCultureID, bool ignoreEmpty)
         {
             ModName = modName;
             TargetCultureID = targetCultureID;
-            LdstrFold = ldstrFold;
             IgnoreEmpty = ignoreEmpty;
         }
 
         public string ModName { get; set; }
         public int TargetCultureID { get; set; }
-        public bool LdstrFold { get; set; }
         public bool IgnoreEmpty { get; set; }
     }
 }

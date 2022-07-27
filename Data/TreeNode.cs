@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using _ReplaceString_.ConfigUI.B_Export;
 using Hjson;
 
@@ -10,7 +11,7 @@ using Terraria.Localization;
 
 namespace _ReplaceString_.Data
 {
-    internal class TreeNode : IEquatable<TreeNode>
+    internal class TreeNode
     {
         public string name;
         public List<TreeNode> children = new List<TreeNode>();
@@ -75,6 +76,7 @@ namespace _ReplaceString_.Data
         {
             return name;
         }
+        public static readonly Regex endNumber = new Regex(@"\d+$", RegexOptions.Compiled);
         public StringBuilder BuildHjson(int depth)
         {
             StringBuilder sb = new StringBuilder();
@@ -86,7 +88,18 @@ namespace _ReplaceString_.Data
             if (this is not Leaf)
             {
                 sb.AppendLine(tab + name + ExportConfig.Space + ':' + ExportConfig.Space + '{');
-                foreach (var child in children.OrderBy(c => c.name))
+                string value = null;
+                foreach (var child in children.OrderBy(c =>
+                {
+                    var match = endNumber.Match(c.name);
+                    if(match.Success)
+                    {
+                        value = match.Value;
+                        return c.name[..match.Index];
+                    }
+                    value = string.Empty;
+                    return c.name[..match.Index];
+                }).ThenBy(_ => value))
                 {
                     sb.Append(child.BuildHjson(depth + 1));
                 }
@@ -98,40 +111,6 @@ namespace _ReplaceString_.Data
             }
             return sb;
         }
-        //public static TreeNode ReadHjson(StreamReader reader, string name = null)
-        //{
-        //    if (name is null)
-        //    {
-        //        name = reader.ReadLine().Trim('\t', ' ');
-        //        name = name[..name.IndexOf(':')].Trim('\t', ' ');
-        //    }
-        //    TreeNode node = new TreeNode(name);
-        //    while (!reader.EndOfStream)
-        //    {
-        //        string text = reader.ReadLine();
-        //        string trim = text.Trim('\t', ' ');
-        //        if (trim == "}")
-        //        {
-        //            break;
-        //        }
-        //        else if (trim == string.Empty)
-        //        {
-        //            continue;
-        //        }
-        //        else
-        //        {
-        //            if (Regex.IsMatch(text, "(?<!:.*): *{(?![a-zA-Z]+)"))
-        //            {
-        //                node += ReadHjson(reader, trim[..trim.IndexOf(':')].Trim('\t', ' '));
-        //            }
-        //            else
-        //            {
-        //                node += Leaf.Read(text, reader);
-        //            }
-        //        }
-        //    }
-        //    return node;
-        //}
         public static TreeNode ReadHjson(JsonValue json)
         {
             var obj = json as JsonObject;
@@ -165,20 +144,6 @@ namespace _ReplaceString_.Data
                     _ => throw new NotImplementedException()
                 });
             }
-        }
-        public virtual bool Equals(TreeNode other)
-        {
-            return name == other.name;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return Equals(obj as TreeNode);
-        }
-
-        public override int GetHashCode()
-        {
-            return name.GetHashCode();
         }
     }
 }

@@ -79,13 +79,5 @@ namespace _ReplaceString_.Data
             }
             return val;
         }
-        public override bool Equals(TreeNode other)
-        {
-            return other is Leaf leaf && name == other.name && value == leaf.value;
-        }
-        public override int GetHashCode()
-        {
-            return name.GetHashCode() + value.GetHashCode();
-        }
     }
 }
