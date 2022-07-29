@@ -59,7 +59,14 @@ namespace _ReplaceString_.Package
                         sb.AppendLine("\t{");
                         var tips = tooltip[leaf.name.Replace("ItemName", "ItemTooltip")] as Leaf;
                         sb.AppendLine($"\t\tOrigin : {tips.GetValue("\t\t")}");
-                        sb.AppendLine($"\t\tCurrent : {tips.GetValue("\t\t")}");
+                        if ((node = transRoot["ItemTooltip"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\t\tCurrent : {node.GetValue("\t\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\t\tCurrent : {tips.GetValue("\t\t")}");
+                        }
                         sb.AppendLine("\t}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
@@ -78,7 +85,14 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
                         sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        if ((node = transRoot["ProjectileName"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        }
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -96,7 +110,14 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
                         sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        if ((node = transRoot["DamageClassName"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        }
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -114,7 +135,14 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
                         sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        if ((node = transRoot["InfoDisplayName"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        }
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -132,7 +160,14 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
                         sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        if ((node = transRoot["BiomeName"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        }
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -153,14 +188,28 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"\tName :");
                         sb.AppendLine("\t{");
                         sb.AppendLine($"\t\tOrigin : {leaf.GetValue("\t\t")}");
-                        sb.AppendLine($"\t\tCurrent : {leaf.GetValue("\t\t")}");
+                        if ((node = transRoot["BuffName"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\t\tCurrent : {node.GetValue("\t\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\t\tCurrent : {leaf.GetValue("\t\t")}");
+                        }
                         sb.AppendLine("\t}");
 
                         sb.AppendLine($"\tDescription :");
                         sb.AppendLine("\t{");
                         var tips = description[leaf.name.Replace("BuffName", "BuffDescription")] as Leaf;
                         sb.AppendLine($"\t\tOrigin : {tips.GetValue("\t\t")}");
-                        sb.AppendLine($"\t\tCurrent : {tips.GetValue("\t\t")}");
+                        if ((node = transRoot["BuffDescription"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\t\tCurrent : {node.GetValue("\t\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\t\tCurrent : {tips.GetValue("\t\t")}");
+                        }
                         sb.AppendLine("\t}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
@@ -179,7 +228,14 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
                         sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        if ((node = transRoot["NPCName"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        }
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -198,7 +254,14 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
                         sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        if ((node = transRoot["Prefix"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        }
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -216,7 +279,15 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
                         sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        //sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        if ((node = transRoot["Containers"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        }
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -234,7 +305,15 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"{leaf.name} :");
                         sb.AppendLine("{");
                         sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        //sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        if ((node = transRoot["tileEntries"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        }
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -252,48 +331,45 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"{leaf.name} :");
                         sb.AppendLine("{");
                         sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        //sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        if ((node = transRoot["wallEntries"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                        }
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
                 }
             }
 
-            //var pathNode = root["Path"];
-            //using (file = new FileStream($"{path}/Path.txt", FileMode.Create))
-            //{
-            //    using (writer = new StreamWriter(file))
-            //    {
-            //        foreach (var leaf in pathNode.children.Select(c => c as Leaf))
-            //        {
-            //            sb.Clear();
-            //            sb.AppendLine($"{leaf.name} :");
-            //            sb.AppendLine("{");
-            //            sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-            //            sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-            //            sb.AppendLine("}");
-            //            writer.WriteLine(sb);
-            //        }
-            //    }
-            //}
-
-            SetupLdstrFolds(root["Ldstr"], path);
+            SetupLdstrFolds(root["Ldstr"], transRoot, path);
 
             return path;
         }
-        private static void SetupLdstrFolds(TreeNode head, string path)
+        private static void SetupLdstrFolds(TreeNode root, TreeNode transRoot, string path)
         {
-            if (head.children.FirstOrDefault() is Leaf)
+            if (root.children.FirstOrDefault() is Leaf)
             {
-                using var file = new FileStream($"{path}/{head.name}.txt", FileMode.Create);
+                using var file = new FileStream($"{path}/{root.name}.txt", FileMode.Create);
                 using var writer = new StreamWriter(file);
                 StringBuilder sb = new StringBuilder();
-                foreach (var leaf in head.children.Select(c => c as Leaf))
+                foreach (var leaf in root.children.Select(c => c as Leaf))
                 {
                     sb.AppendLine($"{leaf.name} :");
                     sb.AppendLine("{");
                     sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
-                    sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                    if ((transRoot.children.Find(c => c.name == leaf.name) is Leaf node))
+                    {
+                        sb.AppendLine($"\tCurrent : {node.GetValue("\t")}");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
+                    }
                     sb.AppendLine("}");
                     writer.WriteLine(sb);
                     sb.Clear();
@@ -301,14 +377,21 @@ namespace _ReplaceString_.Package
             }
             else
             {
-                string newPath = $"{path}/{head.name}";
+                string newPath = $"{path}/{root.name}";
                 if (!Directory.Exists(newPath))
                 {
                     Directory.CreateDirectory(newPath);
                 }
-                foreach (var child in head.children)
+                foreach (var child in root.children)
                 {
-                    SetupLdstrFolds(child, newPath);
+                    if (transRoot.children.Any(c => c.name == child.name))
+                    {
+                        SetupLdstrFolds(child, transRoot[child.name], newPath);
+                    }
+                    else
+                    {
+                        SetupLdstrFolds(child, child, newPath);
+                    }
                 }
             }
         }

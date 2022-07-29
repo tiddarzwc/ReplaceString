@@ -72,11 +72,11 @@ internal class MakeElement : ConfigElement
                 if (baseHjson.IsSelected)
                 {
                     SoundEngine.PlaySound(SoundID.MenuOpen);
-                    var path = $"{Main.SavePath}/Mods/ReplaceString/{baseHjson.Text}";
-                    var path2 = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text}";
+                    var path = $"{Main.SavePath}/Mods/ReplaceString/{baseHjson.Text[2..]}";
+                    var path2 = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text[2..]}";
                     if (File.Exists(path) && File.Exists(path2))
                     {
-                        Make.SetupFolds(path2, path);
+                        Make.SetupFolds(path, path2);
                     }
                     else
                     {
@@ -86,7 +86,7 @@ internal class MakeElement : ConfigElement
                 else
                 {
                     SoundEngine.PlaySound(SoundID.MenuOpen);
-                    var path = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text}";
+                    var path = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text[2..]}";
                     if (File.Exists(path))
                     {
                         Make.SetupFolds(path, path);
@@ -141,7 +141,7 @@ internal class MakeElement : ConfigElement
             if (hjson.IsSelected)
             {
                 SoundEngine.PlaySound(SoundID.MenuOpen);
-                var path = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text}";
+                var path = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text[2..]}";
                 if (File.Exists(path))
                 {
                     Zip.ZipHjson(path);

@@ -97,7 +97,7 @@ public class ReplaceString : Mod
                     }
                     else if(isHjson)
                     {
-                        using var file = new FileStream(fileName, FileMode.Open);
+                        using var file = new FileStream(fileName + ".hjson", FileMode.Open);
                         import = new Import(HjsonValue.Load(file));
                     }
                 }
