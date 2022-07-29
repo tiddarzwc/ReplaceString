@@ -6,7 +6,7 @@ using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.UI;
-namespace _ReplaceString_.ConfigUI.Work
+namespace _ReplaceString_.ConfigUI.C_Work
 {
     internal class FileSelectedUI : UIPanel
     {
@@ -36,7 +36,6 @@ namespace _ReplaceString_.ConfigUI.Work
             };
             text = new UIText(hintText)
             {
-                Left = new StyleDimension(4, 0),
                 Width = new StyleDimension(0, 1),
                 Height = new StyleDimension(30, 0),
                 TextOriginX = 0,
@@ -77,6 +76,7 @@ namespace _ReplaceString_.ConfigUI.Work
                     }
                 }
             };
+            Height.Pixels = 30 + 6 * 2 + (filePanel?.Height.Pixels ?? 0);
         }
 
         public void Expand()
@@ -85,6 +85,7 @@ namespace _ReplaceString_.ConfigUI.Work
             {
                 RemoveChild(filePanel);
                 filePanel = null;
+                Height.Pixels = 30 + 6 * 2;
                 return;
             }
             filePanel = new UIPanel()
@@ -97,11 +98,11 @@ namespace _ReplaceString_.ConfigUI.Work
             };
             filePanel.OnMouseOver += (evt, listeningElement) =>
             {
-                filePanel.BackgroundColor = Color.Transparent;
+                (listeningElement as UIPanel).BackgroundColor = Color.Transparent;
             };
             filePanel.OnMouseOut += (evt, listeningElement) =>
             {
-                filePanel.BackgroundColor = Color.Transparent;
+                (listeningElement as UIPanel).BackgroundColor = Color.Transparent;
             };
             filePanel.SetPadding(6);
             int height = 0;
@@ -195,11 +196,11 @@ namespace _ReplaceString_.ConfigUI.Work
             {
                 Append(filePanel);
             }
+            Height.Pixels = 30 + 6 * 2 + filePanel.Height.Pixels;
         }
 
         public override void Recalculate()
         {
-            Height.Pixels = 30 + 6 * 2 + (filePanel?.Height.Pixels ?? 0);
             base.Recalculate();
         }
     }

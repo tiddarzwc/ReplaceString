@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using _ReplaceString_.ConfigUI.B_Export;
 using Hjson;
 
 using Terraria.Localization;
@@ -83,22 +82,22 @@ namespace _ReplaceString_.Data
             string tab = string.Empty;
             for (int i = 0; i < depth; i++)
             {
-                tab += ExportConfig.SpaceChar;
+                tab += '\t';
             }
             if (this is not Leaf)
             {
-                sb.AppendLine(tab + name + ExportConfig.Space + ':' + ExportConfig.Space + '{');
+                sb.AppendLine(tab + name + " : {");
                 string value = null;
                 foreach (var child in children.OrderBy(c =>
                 {
                     var match = endNumber.Match(c.name);
-                    if(match.Success)
+                    if (match.Success)
                     {
                         value = match.Value;
                         return c.name[..match.Index];
                     }
                     value = string.Empty;
-                    return c.name[..match.Index];
+                    return c.name;
                 }).ThenBy(_ => value))
                 {
                     sb.Append(child.BuildHjson(depth + 1));

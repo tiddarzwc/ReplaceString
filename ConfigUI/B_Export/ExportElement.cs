@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using _ReplaceString_.ConfigUI.ModUI;
 using Microsoft.Xna.Framework;
@@ -14,7 +13,7 @@ using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 
-namespace _ReplaceString_.ConfigUI.Export;
+namespace _ReplaceString_.ConfigUI.B_Export;
 
 internal class ExportElement : ConfigElement<object>
 {

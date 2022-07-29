@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using _ReplaceString_.ConfigUI;
-using _ReplaceString_.ConfigUI.Work;
 using _ReplaceString_.Data;
 using Hjson;
 using Microsoft.Xna.Framework;
@@ -12,7 +11,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
-namespace _ReplaceString_.Translator.UI;
+namespace _ReplaceString_.ConfigUI.C_Work;
 
 internal class UpdateElement : ConfigElement
 {
@@ -37,6 +36,10 @@ internal class UpdateElement : ConfigElement
     private void ResetChildren()
     {
         Elements.Clear();
+        BitsByte expanded = new BitsByte();
+        expanded[0] = oldHjson != null && oldHjson.filePanel != null;
+        expanded[1] = newHjson != null && newHjson.filePanel != null;
+        expanded[2] = transHjson != null && transHjson.filePanel != null;
         UIPanel panel = new UIPanel()
         {
             Width = new StyleDimension(70, 0),
@@ -94,6 +97,10 @@ internal class UpdateElement : ConfigElement
         };
         Append(oldHjson);
         oldHjson.Activate();
+        if (expanded[0])
+        {
+            oldHjson.Expand();
+        }
 
         newHjson = new FileSelectedUI("新版本Hjson")
         {
@@ -106,6 +113,10 @@ internal class UpdateElement : ConfigElement
         };
         Append(newHjson);
         newHjson.Activate();
+        if (expanded[1])
+        {
+            newHjson.Expand();
+        }
 
         transHjson = new FileSelectedUI("翻译后的Hjson")
         {
@@ -118,6 +129,17 @@ internal class UpdateElement : ConfigElement
         };
         Append(transHjson);
         transHjson.Activate();
+        if (expanded[2])
+        {
+            transHjson.Expand();
+        }
+
+        float h = 10 + 8 + 18;
+        foreach (var child in Elements)
+        {
+            h += child.Height.Pixels;
+        }
+        Height.Pixels = h;
     }
 
     public override void Recalculate()

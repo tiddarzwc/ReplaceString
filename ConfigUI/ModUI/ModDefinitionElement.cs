@@ -3,7 +3,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader.Config;
 using Terraria.ModLoader.Config.UI;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
@@ -87,7 +86,14 @@ namespace _ReplaceString_.ConfigUI.ModUI
             ConfigElement.DrawPanel2(spriteBatch, new Vector2(dimension.X, dimension.Y + 1), TextureAssets.SettingsPanel.Value, dimension.Width, dimension.Height - 2, panelColor);
             if (IsMouseHovering && showLoadInfo && ReplaceString.Instance.importStates.TryGetValue(value.Name, out var state))
             {
-                ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value, state.ToString(), Main.MouseScreen + Vector2.One * 16, Color.White, 0f, Vector2.Zero, Vector2.One, 0);
+                if (state == ImportState.Success && ReplaceString.Instance.importInfo.TryGetValue(value.Name, out var info))
+                {
+                    ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value, $"{info.name}\n{info.description}", Main.MouseScreen + Vector2.One * 16, Color.White, 0f, Vector2.Zero, Vector2.One, 0);
+                }
+                else
+                {
+                    ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value, state.ToString(), Main.MouseScreen + Vector2.One * 16, Color.White, 0f, Vector2.Zero, Vector2.One, 0);
+                }
             }
         }
 

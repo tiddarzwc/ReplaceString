@@ -45,7 +45,7 @@ namespace _ReplaceString_.Package
                         exist[(child.name, child.value)] = true;
                         child.value = (translation[child.name] as Leaf).value;
                     }
-                    else if((leaf = exist.Keys.FirstOrDefault(k => k.name == child.name, (null, null))).name != null)
+                    else if ((leaf = exist.Keys.FirstOrDefault(k => k.name == child.name, (null, null))).name != null)
                     {
                         exist[(child.name, child.value)] = true;
                         CacheInfo.AppendLine($"\tChanged Entry : {{");
@@ -62,7 +62,7 @@ namespace _ReplaceString_.Package
                 {
                     CacheInfo.AppendLine($"Missing Entry : ({key} : {value}) - ({translation[key]})");
                 }
-              
+
             }
         }
 

@@ -1,5 +1,4 @@
 ﻿using System.Text.RegularExpressions;
-using _ReplaceString_.ConfigUI.B_Export;
 
 namespace _ReplaceString_.Data
 {
@@ -24,12 +23,6 @@ namespace _ReplaceString_.Data
             {
                 val = className;
             }
-            //else
-            //{
-            //    val = Regex.Replace(
-            //       Regex.Replace(Language.GetTextValue(val), "{\\$(.*)}", new MatchEvaluator(match => Language.GetTextValue(match.Groups[1].Value))),
-            //       "\\${(.*)}", new MatchEvaluator(match => Language.GetTextValue(match.Groups[1].Value)));
-            //}
 
             return val.Trim(' ', '\t', '\n');
         }
@@ -37,9 +30,6 @@ namespace _ReplaceString_.Data
         {
             string className = $"{name.Split('.')[^1]}";
             string val = value;
-            //val = Regex.Replace(
-            //   Regex.Replace(Language.GetTextValue(val), "{\\$(.*)}", new MatchEvaluator(match => Language.GetTextValue(match.Groups[1].Value))),
-            //   "\\${(.*)}", new MatchEvaluator(match => Language.GetTextValue(match.Groups[1].Value)));
             if (string.IsNullOrEmpty(val))
             {
                 val = EmptyString;
@@ -57,17 +47,15 @@ namespace _ReplaceString_.Data
                 val = '\"' + val.Replace("\n", "\\n").Replace("\"", "\\\"") + "\"";
             }
 
-
-
-            return $"{className}{ExportConfig.Space}:{ExportConfig.Space}{val}";
+            return $"{className} : {val}";
         }
-        public string GetValue(string space, bool ignoreEmpty)
+        public string GetValue(string space)
         {
             string className = $"{name.Split('.')[^1]}";
             string val = value;
             if (string.IsNullOrEmpty(val))
             {
-                val = ignoreEmpty ? val : EmptyString;
+                val = EmptyString;
             }
             else if (name == value)
             {
@@ -77,6 +65,7 @@ namespace _ReplaceString_.Data
             {
                 val = "\n" + space + "\t" + Regex.Replace(val, "[\\n\\r]", "\n" + space + "\t");
             }
+
             return val;
         }
     }

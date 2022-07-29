@@ -1,34 +1,27 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text;
-using Terraria;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using _ReplaceString_.ConfigUI.Work;
+using _ReplaceString_.ConfigUI.C_Work;
 using _ReplaceString_.Data;
+using Hjson;
+using Terraria;
 
 namespace _ReplaceString_.Package
 {
     internal static class Make
     {
-        public static MakeConfig config;
-        public static string SetupFolds(TreeNode root, MakeConfig config)
+        public static string SetupFolds(string path)
         {
-            Make.config = config;
-            string path = $"{Main.SavePath}/Mods/ReplaceString/{config.ModName}-{ModLoader.GetMod(root.name).Version.ToString().Replace(".", "")}";
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
             FileStream file;
             StreamWriter writer;
-            StringBuilder sb = new StringBuilder();
-
-            using (file = new FileStream($"{path}/Config.json", FileMode.Create))
+            TreeNode root;
+            using (file = File.OpenRead(path))
             {
-                JsonSerializer.Serialize(file, config, new JsonSerializerOptions() { WriteIndented = true });
+                root = TreeNode.ReadHjson(HjsonValue.Load(file));
+                path = $"{Main.SavePath}/Mods/ReplaceString/{Path.GetFileNameWithoutExtension(path)}";
             }
+            StringBuilder sb = new StringBuilder();
 
             var item = root["ItemName"];
             var tooltip = root["ItemTooltip"];
@@ -43,15 +36,15 @@ namespace _ReplaceString_.Package
                         sb.AppendLine("{");
                         sb.AppendLine($"\tName :");
                         sb.AppendLine("\t{");
-                        sb.AppendLine($"\t\tOrigin : {leaf.GetValue("\t\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\t\tCurrent : {leaf.GetValue("\t\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\t\tOrigin : {leaf.GetValue("\t\t")}");
+                        sb.AppendLine($"\t\tCurrent : {leaf.GetValue("\t\t")}");
                         sb.AppendLine("\t}");
 
                         sb.AppendLine($"\tTooltip :");
                         sb.AppendLine("\t{");
                         var tips = tooltip[leaf.name.Replace("ItemName", "ItemTooltip")] as Leaf;
-                        sb.AppendLine($"\t\tOrigin : {tips.GetValue("\t\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\t\tCurrent : {tips.GetValue("\t\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\t\tOrigin : {tips.GetValue("\t\t")}");
+                        sb.AppendLine($"\t\tCurrent : {tips.GetValue("\t\t")}");
                         sb.AppendLine("\t}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
@@ -69,8 +62,8 @@ namespace _ReplaceString_.Package
                         sb.Clear();
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -87,8 +80,8 @@ namespace _ReplaceString_.Package
                         sb.Clear();
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -105,8 +98,8 @@ namespace _ReplaceString_.Package
                         sb.Clear();
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -123,8 +116,8 @@ namespace _ReplaceString_.Package
                         sb.Clear();
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -144,15 +137,15 @@ namespace _ReplaceString_.Package
                         sb.AppendLine("{");
                         sb.AppendLine($"\tName :");
                         sb.AppendLine("\t{");
-                        sb.AppendLine($"\t\tOrigin : {leaf.GetValue("\t\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\t\tCurrent : {leaf.GetValue("\t\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\t\tOrigin : {leaf.GetValue("\t\t")}");
+                        sb.AppendLine($"\t\tCurrent : {leaf.GetValue("\t\t")}");
                         sb.AppendLine("\t}");
 
                         sb.AppendLine($"\tDescription :");
                         sb.AppendLine("\t{");
                         var tips = description[leaf.name.Replace("BuffName", "BuffDescription")] as Leaf;
-                        sb.AppendLine($"\t\tOrigin : {tips.GetValue("\t\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\t\tCurrent : {tips.GetValue("\t\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\t\tOrigin : {tips.GetValue("\t\t")}");
+                        sb.AppendLine($"\t\tCurrent : {tips.GetValue("\t\t")}");
                         sb.AppendLine("\t}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
@@ -170,8 +163,8 @@ namespace _ReplaceString_.Package
                         sb.Clear();
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -189,8 +182,8 @@ namespace _ReplaceString_.Package
                         sb.Clear();
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -207,8 +200,8 @@ namespace _ReplaceString_.Package
                         sb.Clear();
                         sb.AppendLine($"{leaf.name.Split('.')[^1]} :");
                         sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -225,8 +218,8 @@ namespace _ReplaceString_.Package
                         sb.Clear();
                         sb.AppendLine($"{leaf.name} :");
                         sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -243,8 +236,8 @@ namespace _ReplaceString_.Package
                         sb.Clear();
                         sb.AppendLine($"{leaf.name} :");
                         sb.AppendLine("{");
-                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                        sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                        sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                         sb.AppendLine("}");
                         writer.WriteLine(sb);
                     }
@@ -284,8 +277,8 @@ namespace _ReplaceString_.Package
                 {
                     sb.AppendLine($"{leaf.name} :");
                     sb.AppendLine("{");
-                    sb.AppendLine($"\tOrigin : {leaf.GetValue("\t", config.IgnoreEmpty)}");
-                    sb.AppendLine($"\tCurrent : {leaf.GetValue("\t", config.IgnoreEmpty)}");
+                    sb.AppendLine($"\tOrigin : {leaf.GetValue("\t")}");
+                    sb.AppendLine($"\tCurrent : {leaf.GetValue("\t")}");
                     sb.AppendLine("}");
                     writer.WriteLine(sb);
                     sb.Clear();

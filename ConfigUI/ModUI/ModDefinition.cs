@@ -1,7 +1,4 @@
-﻿using System.Diagnostics;
-using System.Linq;
-using System.Text.Json.Serialization;
-using Terraria.ModLoader.IO;
+﻿using Terraria.ModLoader.IO;
 
 namespace _ReplaceString_.ConfigUI.ModUI
 {

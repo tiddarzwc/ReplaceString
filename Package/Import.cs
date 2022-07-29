@@ -80,7 +80,7 @@ namespace _ReplaceString_.Package
         {
             //用字典查找好一点……但是摸了
             var result = root.children.Find(t => t.name == name);
-            if(result != null)
+            if (result != null)
             {
                 trans.AddTranslation(culture, (result as Leaf).value);
             }

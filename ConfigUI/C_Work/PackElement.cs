@@ -13,7 +13,7 @@ using Terraria.Localization;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 
-namespace _ReplaceString_.Translator.UI;
+namespace _ReplaceString_.ConfigUI.C_Work;
 
 internal class PackElement : ConfigElement
 {
@@ -129,7 +129,7 @@ internal class PackElement : ConfigElement
 
         int margin = 30 + 6;
         foreach (var dir in Directory.GetDirectories($"{Main.SavePath}/Mods/ReplaceString")
-            .Where(p => p.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
+            .Where(p => Path.GetFileName(p).ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
             .Select(p => Path.GetFileName(p)))
         {
             var ui = new UIPanel()
@@ -207,16 +207,15 @@ internal class PackElement : ConfigElement
             ui.Activate();
             Append(ui);
         }
+        Height.Pixels = 40 + (Elements.Count - 2) * 40;
     }
 
     public override void Recalculate()
     {
-        Height.Pixels = 40 + (Elements.Count - 2) * 40;
         if (Parent != null)
         {
             Parent.Height.Pixels = Height.Pixels;
         }
-
         base.Recalculate();
     }
 

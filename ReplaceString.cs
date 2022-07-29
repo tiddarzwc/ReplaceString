@@ -23,6 +23,7 @@ public class ReplaceString : Mod
     public List<ILHook> ilHooks;
     public ModCatcher catcher;
     public Dictionary<string, ImportState> importStates = new Dictionary<string, ImportState>();
+    public Dictionary<string, (string name, string description)> importInfo = new Dictionary<string, (string name, string description)>();
     public static readonly string[] blackList =
     {
         "ModLoader",
@@ -78,16 +79,27 @@ public class ReplaceString : Mod
                     return;
                 }
                 importStates[name] = ImportState.Success;
-                string fileName = $"{Main.SavePath}/Mods/ReplaceString/{name}-{Language.ActiveCulture.Name}.hjson";
-                if (!File.Exists(fileName))
+                string fileName = $"{Main.SavePath}/Mods/ReplaceString/{name}-{modFile.Version.ToString().RemoveChars('.')}-{Language.ActiveCulture.Name}";
+                bool isHjson = File.Exists(fileName + ".hjson");
+                bool isLoc = File.Exists(fileName + ".loc");
+                if (!isLoc && !isHjson)
                 {
                     importStates[name] = ImportState.HjsonNotExist;
                     return;
                 }
-                using var file = new FileStream(fileName, FileMode.Open);
+
                 try
                 {
-                    import = new Import(HjsonValue.Load(file));
+                    if (isLoc)
+                    {
+                        import = new Import(Zip.UnZipHjson(fileName + ".loc", out var info));
+                        importInfo[modFile.Name] = info;
+                    }
+                    else if(isHjson)
+                    {
+                        using var file = new FileStream(fileName, FileMode.Open);
+                        import = new Import(HjsonValue.Load(file));
+                    }
                 }
                 catch (Exception ex)
                 {

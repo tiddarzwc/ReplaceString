@@ -1,7 +1,5 @@
 ﻿using System.IO;
 using System.Linq;
-using _ReplaceString_.ConfigUI;
-using _ReplaceString_.ConfigUI.Work;
 using _ReplaceString_.Data;
 using _ReplaceString_.Package;
 using Hjson;
@@ -16,7 +14,7 @@ using Terraria.Localization;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 
-namespace _ReplaceString_.Translator.UI;
+namespace _ReplaceString_.ConfigUI.C_Work;
 
 internal class MakeElement : ConfigElement
 {
@@ -45,6 +43,7 @@ internal class MakeElement : ConfigElement
     public void ResetChildren()
     {
         Elements.Clear();
+        #region Make
         UIPanel panel = new UIPanel()
         {
             Width = new StyleDimension(50, 0),
@@ -72,11 +71,7 @@ internal class MakeElement : ConfigElement
                 var path = $"{Main.SavePath}/Mods/ReplaceString/{selected.Text}";
                 if (File.Exists(path))
                 {
-                    using var file = new FileStream(path, FileMode.Open);
-                    Make.SetupFolds(TreeNode.ReadHjson(HjsonValue.Load(file)),
-                        new MakeConfig(Path.GetFileName(path).Split('-')[0],
-                        (int)(GameCulture.CultureName)typeof(GameCulture.CultureName).GetEnumValues().Cast<object>().First(c => c.ToString() == ModContent.GetInstance<WorkConfig>().culture),
-                        ModContent.GetInstance<WorkConfig>().ignoreSpace));
+                    Make.SetupFolds(path);
                 }
                 else
                 {
@@ -85,6 +80,7 @@ internal class MakeElement : ConfigElement
             }
         };
         Append(panel);
+
 
         UIText text = new UIText("Make")
         {
@@ -98,19 +94,24 @@ internal class MakeElement : ConfigElement
         };
         panel.Append(text);
         panel.Activate();
+        #endregion
 
-
+        #region Zip
         UIPanel panel2 = new UIPanel()
         {
+            Left = new StyleDimension(50, 0),
             Width = new StyleDimension(50, 0),
-            MarginLeft = 8 + 50,
+            MarginLeft = 8,
             MarginTop = 4,
             HAlign = 0,
             Height = new StyleDimension(26, 0)
         };
         panel2.OnMouseOver += (evt, listeningElement) =>
         {
-            panel2.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
+            if (selected != null)
+            {
+                panel2.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
+            }
         };
         panel2.OnMouseOut += (evt, listeningElement) =>
         {
@@ -118,25 +119,73 @@ internal class MakeElement : ConfigElement
         };
         panel2.OnClick += (evt, listeningElement) =>
         {
+            if (selected != null)
+            {
+                SoundEngine.PlaySound(SoundID.MenuOpen);
+                var path = $"{Main.SavePath}/Mods/ReplaceString/{selected.Text}";
+                if (File.Exists(path))
+                {
+                    Zip.ZipHjson(path);
+                }
+                else
+                {
+                    ResetChildren();
+                }
+            }
+        };
+        Append(panel2);
+
+        UIText text2 = new UIText("Zip")
+        {
+            HAlign = 0.5f,
+            VAlign = 0.5f,
+            TextColor = Color.Gray
+        };
+        text2.OnUpdate += delegate
+        {
+            text2.TextColor = selected != null ? Color.White : Color.Gray;
+        };
+        panel2.Append(text2);
+        panel2.Activate();
+        #endregion
+
+        UIPanel panel3 = new UIPanel()
+        {
+            Width = new StyleDimension(50, 0),
+            MarginLeft = 8 + 50 + 50,
+            MarginTop = 4,
+            HAlign = 0,
+            Height = new StyleDimension(26, 0)
+        };
+        panel3.OnMouseOver += (evt, listeningElement) =>
+        {
+            panel3.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
+        };
+        panel3.OnMouseOut += (evt, listeningElement) =>
+        {
+            panel3.BackgroundColor = new Color(44, 57, 105, 178);
+        };
+        panel3.OnClick += (evt, listeningElement) =>
+        {
             SoundEngine.PlaySound(SoundID.MenuOpen);
             selected = null;
             ResetChildren();
         };
-        Append(panel2);
+        Append(panel3);
 
-        UIText text2 = new UIText("刷新")
+        UIText text3 = new UIText("刷新")
         {
             HAlign = 0.5f,
             VAlign = 0.5f
         };
-        panel2.Append(text2);
-        panel2.Activate();
+        panel3.Append(text3);
+        panel3.Activate();
 
 
         int margin = 30 + 6;
         foreach (var file in Directory.GetFiles($"{Main.SavePath}/Mods/ReplaceString")
             .Where(p => Path.GetExtension(p) == ".hjson")
-            .Where(p => p.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
+            .Where(p => Path.GetFileName(p).ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
             .Select(p => Path.GetFileName(p)))
         {
             var ui = new UIPanel()
@@ -193,7 +242,7 @@ internal class MakeElement : ConfigElement
             ui.Activate();
             Append(ui);
         }
-        if (Elements.Count == 2)
+        if (Elements.Count == 3)
         {
             var ui = new UIPanel()
             {
@@ -214,11 +263,11 @@ internal class MakeElement : ConfigElement
             ui.Activate();
             Append(ui);
         }
+        Height.Pixels = 40 + (Elements.Count - 3) * 40;
     }
 
     public override void Recalculate()
     {
-        Height.Pixels = 40 + (Elements.Count - 2) * 40;
         if (Parent != null)
         {
             Parent.Height.Pixels = Height.Pixels;

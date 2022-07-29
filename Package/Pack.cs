@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using _ReplaceString_.ConfigUI.Work;
+using _ReplaceString_.ConfigUI.C_Work;
 using _ReplaceString_.Data;
 
 namespace _ReplaceString_.Package
@@ -89,7 +89,7 @@ namespace _ReplaceString_.Package
             {
                 while ((line = reader.ReadLine()).StartsWith(startWith))
                 {
-                    value += (firstRead ? "" : "\n") + line[3..];
+                    value += (firstRead ? "" : "\n") + line[startWith.Length..];
                     firstRead = false;
                 }
                 reader.RollBack();
@@ -203,7 +203,7 @@ namespace _ReplaceString_.Package
         {
             for (int i = 0; i < root.children.Count; i++)
             {
-                if(CullEmpty(root.children[i]))
+                if (CullEmpty(root.children[i]))
                 {
                     root.children.RemoveAt(i--);
                 }

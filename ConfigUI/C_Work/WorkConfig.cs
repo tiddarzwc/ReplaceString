@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.Localization;
+﻿using System.ComponentModel;
 using Terraria.ModLoader.Config;
 
-namespace _ReplaceString_.Translator.UI;
+namespace _ReplaceString_.ConfigUI.C_Work;
 #pragma warning disable CS0649
 internal class WorkConfig : ModConfig
 {
     public override ConfigScope Mode => ConfigScope.ClientSide;
-    [Label("Culture")]
+    [Label("Culture (for make)")]
     [DefaultValue("Chinese")]
     [OptionStrings(new string[]
     {
@@ -27,16 +21,15 @@ internal class WorkConfig : ModConfig
         "Polish",
         "Unknown"
     })]
-    public string culture; 
-     
-    [Label("Ignore Space")]
-    [DefaultValue(false)]
-    public bool ignoreSpace;
+    public string culture;
+    [Label("Author Name (for zip)")]
+    public string author;
+    [Label("Description (for zip)")]
+    public string description;
 
     [Label("Make")]
     [CustomModConfigItem(typeof(MakeElement))]
     public object make;
-
 
     [Label("Pack")]
     [CustomModConfigItem(typeof(PackElement))]
@@ -45,5 +38,6 @@ internal class WorkConfig : ModConfig
     [Label("Update")]
     [CustomModConfigItem(typeof(UpdateElement))]
     public object update;
+
 }
 #pragma warning restore CS0649

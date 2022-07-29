@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -26,12 +27,12 @@ namespace _ReplaceString_
                     }
                 }
             }
-            return sb.Length == 0 ? str : sb.ToString();
+            return sb.Length == 0 ? str[currentPos..] : sb.ToString();
         }
         public static string GetSpecialMethodName(MethodBase method)
         {
             StringBuilder name = new StringBuilder();
-            name.Append(method.Name.RemoveChars(',', '`'));
+            name.Append(method.Name.RemoveChars(',', '`', '.'));
             if (method.IsGenericMethod)
             {
                 name.Append('g');
@@ -45,12 +46,12 @@ namespace _ReplaceString_
                     name.Append(GetSpecialTypeName(param));
                 }
             }
-            foreach(var param in method.GetParameters())
+            foreach (var param in method.GetParameters())
             {
                 name.Append('_');
                 name.Append(GetSpecialTypeName(param.ParameterType));
             }
-            if(method is MethodInfo temp)
+            if (method is MethodInfo temp)
             {
                 name.Append('_').Append(GetSpecialTypeName(temp.ReturnType));
             }
@@ -59,7 +60,7 @@ namespace _ReplaceString_
         public static string GetSpecialMethodName(MethodDefinition method)
         {
             StringBuilder name = new StringBuilder();
-            name.Append(method.Name.RemoveChars(',', '`'));
+            name.Append(method.Name.RemoveChars(',', '`', '.'));
             if (method.HasGenericParameters)
             {
                 name.Append('g');
@@ -78,16 +79,17 @@ namespace _ReplaceString_
                 name.Append('_');
                 name.Append(GetSpecialTypeName(param.ParameterType));
             }
+            Debug.Assert(!name.ToString().Contains('.'));
             return name.ToString();
         }
         public static string GetSpecialTypeName(Type type)
         {
-            if(type.IsGenericType)
+            if (type.IsGenericType)
             {
                 StringBuilder sb = new StringBuilder();
                 sb.Append(type.Name.RemoveChars('[', ',', '`').Replace(']', 's').Replace("&", "Ref"));
                 sb.Append('g');
-                foreach(var t in type.GetGenericArguments())
+                foreach (var t in type.GetGenericArguments())
                 {
                     sb.Append('_');
                     sb.Append(GetSpecialTypeName(t));

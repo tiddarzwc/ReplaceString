@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
@@ -46,7 +45,7 @@ public class ModCatcher : IDisposable
                 .EmitDelegate((Texture2D icon, object mod) =>
             {
                 string name = (string)mod.GetType().GetProperty("Name", BindingFlags.Public | BindingFlags.Instance).GetValue(mod);
-                if(ReplaceString.blackList.Contains(name))
+                if (ReplaceString.blackList.Contains(name))
                 {
                     return icon;
                 }
@@ -69,6 +68,7 @@ public class ModCatcher : IDisposable
     {
         hook.Dispose();
         hook = null;
+        GC.SuppressFinalize(this);
     }
     private static object modsMenu;
     private static FieldInfo info;
