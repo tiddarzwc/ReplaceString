@@ -69,8 +69,8 @@ internal class PackElement : ConfigElement
                 var path = $"{Main.SavePath}/Mods/ReplaceString/{selected.Text}";
                 if (Directory.Exists(path))
                 {
-                    var (treeNode, config) = Pack.Packup(path);
-                    File.WriteAllText($"{Main.SavePath}/Mods/ReplaceString/{treeNode.name}-{GameCulture.FromCultureName((GameCulture.CultureName)config.TargetCultureID).Name}-packed.hjson", treeNode.BuildHjson(0).ToString());
+                    var treeNode = Pack.Packup(path);
+                    File.WriteAllText($"{path}-packed.hjson", treeNode.BuildHjson(0).ToString());
                 }
                 else
                 {

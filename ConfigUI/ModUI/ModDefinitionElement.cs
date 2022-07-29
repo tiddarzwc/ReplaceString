@@ -17,6 +17,8 @@ namespace _ReplaceString_.ConfigUI.ModUI
         public ModDefinition value;
         public UIText text;
         public bool showLoadInfo;
+        public static string HoverString { get; set; }
+        public static Vector2 HoverPosition { get; set; }
         public Color DefaultColor
         {
             get
@@ -88,12 +90,13 @@ namespace _ReplaceString_.ConfigUI.ModUI
             {
                 if (state == ImportState.Success && ReplaceString.Instance.importInfo.TryGetValue(value.Name, out var info))
                 {
-                    ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value, $"{info.name}\n{info.description}", Main.MouseScreen + Vector2.One * 16, Color.White, 0f, Vector2.Zero, Vector2.One, 0);
+                    HoverString = $"{info.name}\n{info.description}";
                 }
                 else
                 {
-                    ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value, state.ToString(), Main.MouseScreen + Vector2.One * 16, Color.White, 0f, Vector2.Zero, Vector2.One, 0);
+                    HoverString = state.ToString();
                 }
+                HoverPosition = Main.MouseScreen + Vector2.One * 16;
             }
         }
 

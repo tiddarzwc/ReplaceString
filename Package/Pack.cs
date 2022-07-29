@@ -77,7 +77,7 @@ namespace _ReplaceString_.Package
     }
     internal static class Pack
     {
-        public static MakeConfig config;
+        public static string modName;
         public static string ReadValue(CacheReader reader, string symbol, string startWith)
         {
             string line, value;
@@ -132,7 +132,7 @@ namespace _ReplaceString_.Package
                     value = ReadValue(reader, "Current :", startWith);
                     if (oldValue != value && !string.IsNullOrWhiteSpace(value))
                     {
-                        nodes[i] += new Leaf($"{config.ModName}.{args[i]}.{key}", value);
+                        nodes[i] += new Leaf($"{modName}.{args[i]}.{key}", value);
                     }
                 }
             }
@@ -141,14 +141,11 @@ namespace _ReplaceString_.Package
                 root += node;
             }
         }
-        public static (TreeNode root, MakeConfig config) Packup(string path)
+        public static TreeNode Packup(string path)
         {
-            using (FileStream file = new FileStream($"{path}/Config.json", FileMode.Open))
-            {
-                config = JsonSerializer.Deserialize<MakeConfig>(file);
-            }
-
-            TreeNode root = new TreeNode(config.ModName);
+            var fileName = Path.GetFileName(path);
+            modName = fileName[..(fileName.IndexOf('-'))];
+            TreeNode root = new TreeNode(modName);
             ReadFile($"{path}/Item.txt", root, "ItemName", "ItemTooltip");
             ReadFile($"{path}/Projectile.txt", root, "ProjectileName");
             ReadFile($"{path}/DamageClass.txt", root, "DamageClassName");
@@ -167,7 +164,7 @@ namespace _ReplaceString_.Package
 
             CullEmpty(root);
 
-            return (root, config);
+            return root;
         }
         private static void PackupLdstr(string path, TreeNode node)
         {

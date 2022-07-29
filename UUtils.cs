@@ -20,6 +20,7 @@ namespace _ReplaceString_
                     if (currentPos != i)
                     {
                         sb.Append(str[currentPos..i]);
+                        currentPos = i + 1;
                     }
                     else
                     {
@@ -27,6 +28,7 @@ namespace _ReplaceString_
                     }
                 }
             }
+            sb.Append(str[currentPos..]);
             return sb.Length == 0 ? str[currentPos..] : sb.ToString();
         }
         public static string GetSpecialMethodName(MethodBase method)

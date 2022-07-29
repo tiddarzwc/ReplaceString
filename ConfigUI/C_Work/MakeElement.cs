@@ -18,7 +18,9 @@ namespace _ReplaceString_.ConfigUI.C_Work;
 
 internal class MakeElement : ConfigElement
 {
-    public UIText selected = null;
+    public FileSelectedUI hjson;
+    public FileSelectedUI baseHjson;
+    //public UIText selected = null;
     public bool fliterHooked = false;
     public override void OnInitialize()
     {
@@ -54,7 +56,7 @@ internal class MakeElement : ConfigElement
         };
         panel.OnMouseOver += (evt, listeningElement) =>
         {
-            if (selected != null)
+            if (hjson.IsSelected)
             {
                 panel.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
             }
@@ -65,17 +67,34 @@ internal class MakeElement : ConfigElement
         };
         panel.OnClick += (evt, listeningElement) =>
         {
-            if (selected != null)
+            if (hjson.IsSelected)
             {
-                SoundEngine.PlaySound(SoundID.MenuOpen);
-                var path = $"{Main.SavePath}/Mods/ReplaceString/{selected.Text}";
-                if (File.Exists(path))
+                if (baseHjson.IsSelected)
                 {
-                    Make.SetupFolds(path);
+                    SoundEngine.PlaySound(SoundID.MenuOpen);
+                    var path = $"{Main.SavePath}/Mods/ReplaceString/{baseHjson.Text}";
+                    var path2 = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text}";
+                    if (File.Exists(path) && File.Exists(path2))
+                    {
+                        Make.SetupFolds(path2, path);
+                    }
+                    else
+                    {
+                        ResetChildren();
+                    }
                 }
                 else
                 {
-                    ResetChildren();
+                    SoundEngine.PlaySound(SoundID.MenuOpen);
+                    var path = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text}";
+                    if (File.Exists(path))
+                    {
+                        Make.SetupFolds(path, path);
+                    }
+                    else
+                    {
+                        ResetChildren();
+                    }
                 }
             }
         };
@@ -90,7 +109,7 @@ internal class MakeElement : ConfigElement
         };
         text.OnUpdate += delegate
         {
-            text.TextColor = selected != null ? Color.White : Color.Gray;
+            text.TextColor = hjson.IsSelected ? Color.White : Color.Gray;
         };
         panel.Append(text);
         panel.Activate();
@@ -108,7 +127,7 @@ internal class MakeElement : ConfigElement
         };
         panel2.OnMouseOver += (evt, listeningElement) =>
         {
-            if (selected != null)
+            if (hjson.IsSelected)
             {
                 panel2.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
             }
@@ -119,10 +138,10 @@ internal class MakeElement : ConfigElement
         };
         panel2.OnClick += (evt, listeningElement) =>
         {
-            if (selected != null)
+            if (hjson.IsSelected)
             {
                 SoundEngine.PlaySound(SoundID.MenuOpen);
-                var path = $"{Main.SavePath}/Mods/ReplaceString/{selected.Text}";
+                var path = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text}";
                 if (File.Exists(path))
                 {
                     Zip.ZipHjson(path);
@@ -143,7 +162,7 @@ internal class MakeElement : ConfigElement
         };
         text2.OnUpdate += delegate
         {
-            text2.TextColor = selected != null ? Color.White : Color.Gray;
+            text2.TextColor = hjson.IsSelected ? Color.White : Color.Gray;
         };
         panel2.Append(text2);
         panel2.Activate();
@@ -168,7 +187,6 @@ internal class MakeElement : ConfigElement
         panel3.OnClick += (evt, listeningElement) =>
         {
             SoundEngine.PlaySound(SoundID.MenuOpen);
-            selected = null;
             ResetChildren();
         };
         Append(panel3);
@@ -181,93 +199,114 @@ internal class MakeElement : ConfigElement
         panel3.Append(text3);
         panel3.Activate();
 
-
-        int margin = 30 + 6;
-        foreach (var file in Directory.GetFiles($"{Main.SavePath}/Mods/ReplaceString")
-            .Where(p => Path.GetExtension(p) == ".hjson")
-            .Where(p => Path.GetFileName(p).ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
-            .Select(p => Path.GetFileName(p)))
+        hjson = new FileSelectedUI("选择Hjson")
         {
-            var ui = new UIPanel()
-            {
-                Height = new StyleDimension(40, 0),
-                MarginTop = margin,
-                Width = new StyleDimension(-16, 1),
-                MarginLeft = 8,
-                BackgroundColor = new Color(44 - 23 - 10, 57 - 23 - 5, 105 - 23, 178),
-                BorderColor = Color.Transparent
-            };
-            var fileName = new UIText(file)
-            {
-                HAlign = 0.5f
-            };
-            ui.OnMouseOver += (evt, listeningElement) =>
-            {
-                ui.BorderColor = Color.Gold;
-                if (fileName.TextColor == Color.White)
-                {
-                    fileName.TextColor = Color.Yellow;
-                }
-            };
-            ui.OnMouseOut += (evt, listeningElement) =>
-            {
-                ui.BorderColor = Color.Transparent;
-                if (fileName.TextColor == Color.Yellow)
-                {
-                    fileName.TextColor = Color.White;
-                }
-            };
-            ui.OnClick += delegate
-            {
-                SoundEngine.PlaySound(SoundID.MenuTick);
-                if (selected == fileName)
-                {
-                    selected = null;
-                    fileName.TextColor = Color.Yellow;
-                }
-                else if (selected == null)
-                {
-                    selected = fileName;
-                    fileName.TextColor = Color.Red;
-                }
-                else
-                {
-                    selected.TextColor = Color.White;
-                    selected = fileName;
-                    fileName.TextColor = Color.Red;
-                }
-            };
-            margin += 40;
-            ui.Append(fileName);
-            ui.Activate();
-            Append(ui);
-        }
-        if (Elements.Count == 3)
+            Top = new StyleDimension(30 + 6, 0),
+            Left = new StyleDimension(8, 0),
+            Width = new StyleDimension(-16, 1),
+        };
+        Append(hjson);
+        hjson.Activate();
+        baseHjson = new FileSelectedUI("Based Hjson ( 可选 )")
         {
-            var ui = new UIPanel()
-            {
-                Height = new StyleDimension(40, 0),
-                MarginTop = margin,
-                Width = new StyleDimension(-16, 1),
-                MarginLeft = 8,
-                BackgroundColor = new Color(44 - 23 - 10, 57 - 23 - 5, 105 - 23, 178),
-                BorderColor = Color.Transparent
-            };
-            var uiText = new UIText("（暂无内容）")
-            {
-                HAlign = 0.5f,
-                TextColor = Color.Gray
-            };
-            margin += 40;
-            ui.Append(uiText);
-            ui.Activate();
-            Append(ui);
-        }
-        Height.Pixels = 40 + (Elements.Count - 3) * 40;
+            Top = new StyleDimension(30 + 12 + hjson.Height.Pixels, 0),
+            Left = new StyleDimension(8, 0),
+            Width = new StyleDimension(-16, 1),
+        };
+        baseHjson.OnUpdate += ui =>
+        {
+            ui.Top = new StyleDimension(30 + 12 + hjson.Height.Pixels, 0);
+        };
+        Append(baseHjson);
+        baseHjson.Activate();
+        //int margin = 30 + 6;
+        //foreach (var file in Directory.GetFiles($"{Main.SavePath}/Mods/ReplaceString")
+        //    .Where(p => Path.GetExtension(p) == ".hjson")
+        //    .Where(p => Path.GetFileName(p).ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
+        //    .Select(p => Path.GetFileName(p)))
+        //{
+        //    var ui = new UIPanel()
+        //    {
+        //        Height = new StyleDimension(40, 0),
+        //        MarginTop = margin,
+        //        Width = new StyleDimension(-16, 1),
+        //        MarginLeft = 8,
+        //        BackgroundColor = new Color(44 - 23 - 10, 57 - 23 - 5, 105 - 23, 178),
+        //        BorderColor = Color.Transparent
+        //    };
+        //    var fileName = new UIText(file)
+        //    {
+        //        HAlign = 0.5f
+        //    };
+        //    ui.OnMouseOver += (evt, listeningElement) =>
+        //    {
+        //        ui.BorderColor = Color.Gold;
+        //        if (fileName.TextColor == Color.White)
+        //        {
+        //            fileName.TextColor = Color.Yellow;
+        //        }
+        //    };
+        //    ui.OnMouseOut += (evt, listeningElement) =>
+        //    {
+        //        ui.BorderColor = Color.Transparent;
+        //        if (fileName.TextColor == Color.Yellow)
+        //        {
+        //            fileName.TextColor = Color.White;
+        //        }
+        //    };
+        //    ui.OnClick += delegate
+        //    {
+        //        SoundEngine.PlaySound(SoundID.MenuTick);
+        //        if (selected == fileName)
+        //        {
+        //            selected = null;
+        //            fileName.TextColor = Color.Yellow;
+        //        }
+        //        else if (selected == null)
+        //        {
+        //            selected = fileName;
+        //            fileName.TextColor = Color.Red;
+        //        }
+        //        else
+        //        {
+        //            selected.TextColor = Color.White;
+        //            selected = fileName;
+        //            fileName.TextColor = Color.Red;
+        //        }
+        //    };
+        //    margin += 40;
+        //    ui.Append(fileName);
+        //    ui.Activate();
+        //    Append(ui);
+        //}
+        //if (Elements.Count == 3)
+        //{
+        //    var ui = new UIPanel()
+        //    {
+        //        Height = new StyleDimension(40, 0),
+        //        MarginTop = margin,
+        //        Width = new StyleDimension(-16, 1),
+        //        MarginLeft = 8,
+        //        BackgroundColor = new Color(44 - 23 - 10, 57 - 23 - 5, 105 - 23, 178),
+        //        BorderColor = Color.Transparent
+        //    };
+        //    var uiText = new UIText("（暂无内容）")
+        //    {
+        //        HAlign = 0.5f,
+        //        TextColor = Color.Gray
+        //    };
+        //    margin += 40;
+        //    ui.Append(uiText);
+        //    ui.Activate();
+        //    Append(ui);
+        //}
+        Height.Pixels = 46 + baseHjson.Height.Pixels + hjson.Height.Pixels;
     }
 
     public override void Recalculate()
     {
+        if(hjson != null)
+        Height.Pixels = 46 + baseHjson.Height.Pixels + hjson.Height.Pixels;
         if (Parent != null)
         {
             Parent.Height.Pixels = Height.Pixels;

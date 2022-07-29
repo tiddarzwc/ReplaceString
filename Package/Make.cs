@@ -1,8 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
-using _ReplaceString_.ConfigUI.C_Work;
 using _ReplaceString_.Data;
 using Hjson;
 using Terraria;
@@ -11,15 +9,25 @@ namespace _ReplaceString_.Package
 {
     internal static class Make
     {
-        public static string SetupFolds(string path)
+        public static string SetupFolds(string path, string transPath)
         {
             FileStream file;
             StreamWriter writer;
             TreeNode root;
+            TreeNode transRoot;
+            Leaf node;
             using (file = File.OpenRead(path))
             {
                 root = TreeNode.ReadHjson(HjsonValue.Load(file));
                 path = $"{Main.SavePath}/Mods/ReplaceString/{Path.GetFileNameWithoutExtension(path)}";
+            }
+            using (file = File.OpenRead(transPath))
+            {
+                transRoot = TreeNode.ReadHjson(HjsonValue.Load(file));
+            }
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
             }
             StringBuilder sb = new StringBuilder();
 
@@ -37,7 +45,14 @@ namespace _ReplaceString_.Package
                         sb.AppendLine($"\tName :");
                         sb.AppendLine("\t{");
                         sb.AppendLine($"\t\tOrigin : {leaf.GetValue("\t\t")}");
-                        sb.AppendLine($"\t\tCurrent : {leaf.GetValue("\t\t")}");
+                        if ((node = transRoot["ItemName"].children.Find(c => c.name == leaf.name) as Leaf) != null)
+                        {
+                            sb.AppendLine($"\t\tCurrent : {node.GetValue("\t\t")}");
+                        }
+                        else
+                        {
+                            sb.AppendLine($"\t\tCurrent : {leaf.GetValue("\t\t")}");
+                        }
                         sb.AppendLine("\t}");
 
                         sb.AppendLine($"\tTooltip :");

@@ -123,6 +123,17 @@ namespace _ReplaceString_.ConfigUI.ModUI
                 ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value, "Loading...", position, Color.White, 0f, Vector2.Zero, baseScale, settingsWidth);
             }
         }
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            base.Draw(spriteBatch);
+            if (!string.IsNullOrWhiteSpace(ModDefinitionElement.HoverString))
+            {
+                ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value,
+                    ModDefinitionElement.HoverString, ModDefinitionElement.HoverPosition,
+                    Color.White, 0f, Vector2.Zero, Vector2.One, 0);
+                ModDefinitionElement.HoverString = null;
+            }
+        }
     }
 
 }
