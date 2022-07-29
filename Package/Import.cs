@@ -206,9 +206,10 @@ namespace _ReplaceString_.Package
             }
             var oldstr = oldTree["Ldstr"];
             //var oldpath = oldTree["Path"];
-            for (int i = 0; i < ldstr.children.Count; i++)
+            var it = ldstr.children.Join(oldstr.children, n => n.name, n => n.name, (n1, n2) => (n1, n2));
+            foreach (var (n1, n2) in it)
             {
-                AddLdstr(ldstr.children[i], oldstr.children[i], string.Empty);
+                AddLdstr(n1, n2, string.Empty);
             }
             //AddPath(path, oldpath);
         }
