@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using _ReplaceString_.ConfigUI.A_Load;
 using _ReplaceString_.ConfigUI.ModUI;
+using _ReplaceString_.Data;
 using _ReplaceString_.Package;
 using Hjson;
 using Mono.Cecil.Cil;
@@ -19,6 +20,7 @@ using Terraria.ModLoader.Core;
 namespace _ReplaceString_;
 public class ReplaceString : Mod
 {
+    public static string BasePath => "ReplaceString";
     public List<Hook> hooks;
     public List<ILHook> ilHooks;
     public ModCatcher catcher;
@@ -42,7 +44,7 @@ public class ReplaceString : Mod
         hooks = new List<Hook>();
         ilHooks = new List<ILHook>();
         Import import = null;
-        string logPath = $"{Main.SavePath}/Mods/ReplaceString/log.txt";
+        string logPath = $"{ReplaceString.BasePath}/log.txt";
         #region ConfigLoad
         LoadConfig config = new LoadConfig();
         try
@@ -50,6 +52,7 @@ public class ReplaceString : Mod
             string path = $"{Main.SavePath}/ModConfigs/_ReplaceString__LoadConfig.json";
             string json = File.Exists(path) ? File.ReadAllText(path) : "{}";
             JsonConvert.PopulateObject(json, config);
+            DefaultTranslation.Load();
         }
         catch (Exception ex)
         {
@@ -79,10 +82,9 @@ public class ReplaceString : Mod
                     return;
                 }
                 importStates[name] = ImportState.Success;
-                string fileName = $"{Main.SavePath}/Mods/ReplaceString/{name}-{modFile.Version.ToString().RemoveChars('.')}-{Language.ActiveCulture.Name}";
-                bool isHjson = File.Exists(fileName + ".hjson");
-                bool isLoc = File.Exists(fileName + ".loc");
-                if (!isLoc && !isHjson)
+                string locFile = DefaultTranslation.Get(modFile) ?? Directory.GetFiles(BasePath, $"{name}*.loc").FirstOrDefault();
+                string hjsonFile = DefaultTranslation.Get(modFile) ?? Directory.GetFiles(BasePath, $"{name}*.hjson").FirstOrDefault();
+                if (hjsonFile is null && locFile is null)
                 {
                     importStates[name] = ImportState.HjsonNotExist;
                     return;
@@ -90,14 +92,14 @@ public class ReplaceString : Mod
 
                 try
                 {
-                    if (isLoc)
+                    if (locFile != null)
                     {
-                        import = new Import(Zip.UnZipHjson(fileName + ".loc", out var info));
+                        import = new Import(Zip.UnZipHjson(locFile, out var info));
                         importInfo[modFile.Name] = info;
                     }
-                    else if(isHjson)
+                    else
                     {
-                        using var file = new FileStream(fileName + ".hjson", FileMode.Open);
+                        using var file = new FileStream(hjsonFile, FileMode.Open);
                         import = new Import(HjsonValue.Load(file));
                     }
                 }

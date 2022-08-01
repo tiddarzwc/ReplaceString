@@ -56,11 +56,11 @@ internal class ExportElement : ConfigElement<object>
                 SoundEngine.PlaySound(SoundID.MenuOpen);
                 var mod = ModLoader.GetMod(selected.value.Name);
                 Package.Export export = new Package.Export(mod);
-                if (!Directory.Exists($"{Main.SavePath}/Mods/ReplaceString"))
+                if (!Directory.Exists(ReplaceString.BasePath))
                 {
-                    Directory.CreateDirectory($"{Main.SavePath}/Mods/ReplaceString");
+                    Directory.CreateDirectory(ReplaceString.BasePath);
                 }
-                using FileStream file = new FileStream($"{Main.SavePath}/Mods/ReplaceString/{mod.Name}-{mod.Version.ToString().Replace(".", "")}-{Language.ActiveCulture.Name}.hjson", FileMode.Create);
+                using FileStream file = new FileStream($"{ReplaceString.BasePath}/{mod.Name}-{mod.Version.ToString().Replace(".", "")}-{Language.ActiveCulture.Name}.hjson", FileMode.Create);
                 export.Hjson(file);
             }
         };

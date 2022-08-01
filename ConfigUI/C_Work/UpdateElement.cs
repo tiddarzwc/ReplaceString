@@ -63,7 +63,7 @@ internal class UpdateElement : ConfigElement
         {
             if (oldHjson.IsSelected && newHjson.IsSelected && transHjson.IsSelected)
             {
-                var path = $"{Main.SavePath}/Mods/ReplaceString/";
+                var path = $"{ReplaceString.BasePath}/";
                 var o = TreeNode.ReadHjson(HjsonValue.Load(path + oldHjson.Text[2..]));
                 var n = TreeNode.ReadHjson(HjsonValue.Load(path + newHjson.Text[2..]));
                 var t = TreeNode.ReadHjson(HjsonValue.Load(path + transHjson.Text[2..]));

@@ -106,7 +106,7 @@ namespace _ReplaceString_.ConfigUI.C_Work
             };
             filePanel.SetPadding(6);
             int height = 0;
-            foreach (var file in Directory.GetFiles($"{Main.SavePath}/Mods/ReplaceString")
+            foreach (var file in Directory.GetFiles(ReplaceString.BasePath)
                 .Where(p => Path.GetExtension(p) == ".hjson")
                 .Where(p => p.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
                 .Select(p => Path.GetFileName(p)))

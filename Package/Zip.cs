@@ -11,8 +11,9 @@ namespace _ReplaceString_.Package
     {
         public static void ZipHjson(string path)
         {
-            var locPath = Path.ChangeExtension(path.Replace("-packed", ""), ".loc");
-            int endIndex = locPath.LastIndexOf('.'), startIndex = locPath.Length - 1;
+            var config = ModContent.GetInstance<WorkConfig>();
+            var locPath = Path.GetFileNameWithoutExtension(path.Replace("-packed", ""));
+            int endIndex = locPath.Length, startIndex = locPath.Length - 1;
             int temp = 2;
             for (; startIndex > 0; startIndex--)
             {
@@ -27,11 +28,10 @@ namespace _ReplaceString_.Package
                 .GetEnumValues()
                 .Cast<GameCulture.CultureName>()
                 .FirstOrDefault(c => c.ToString() == ModContent.GetInstance<WorkConfig>().culture)).Name);
-            using var zip = new GZipStream(File.OpenWrite(locPath), CompressionLevel.Optimal);
+            using var zip = new GZipStream(File.OpenWrite($"{ReplaceString.BasePath}/{locPath}--{config.author.RemoveChars(Path.GetInvalidFileNameChars())}.loc"), CompressionLevel.Optimal);
             using var writer = new BinaryWriter(zip);
-            var config = ModContent.GetInstance<WorkConfig>();
-            writer.Write(config.author);
-            writer.Write(config.description);
+            writer.Write(config.author ?? string.Empty);
+            writer.Write(config.description ?? string.Empty);
             var hjson = HjsonValue.Load(File.OpenRead(path));
             hjson.Save(zip, Stringify.Plain);
         }

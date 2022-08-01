@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using _ReplaceString_.ConfigUI.ModUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
@@ -8,7 +9,7 @@ using Terraria.UI;
 using Terraria.UI.Chat;
 using static _ReplaceString_.ConfigUI.Constant;
 
-namespace _ReplaceString_.ConfigUI.ModUI
+namespace _ReplaceString_.ConfigUI.A_Load
 {
     public class ModSelectedElement : UIElement
     {

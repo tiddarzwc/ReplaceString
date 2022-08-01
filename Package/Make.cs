@@ -19,7 +19,7 @@ namespace _ReplaceString_.Package
             using (file = File.OpenRead(path))
             {
                 root = TreeNode.ReadHjson(HjsonValue.Load(file));
-                path = $"{Main.SavePath}/Mods/ReplaceString/{Path.GetFileNameWithoutExtension(path)}";
+                path = $"{ReplaceString.BasePath}/{Path.GetFileNameWithoutExtension(path)}";
             }
             using (file = File.OpenRead(transPath))
             {

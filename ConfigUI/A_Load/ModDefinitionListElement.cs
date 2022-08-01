@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using _ReplaceString_.ConfigUI.ModUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
@@ -10,7 +11,7 @@ using Terraria.UI;
 using Terraria.UI.Chat;
 using static _ReplaceString_.ConfigUI.Constant;
 
-namespace _ReplaceString_.ConfigUI.ModUI
+namespace _ReplaceString_.ConfigUI.A_Load
 {
     internal class ModDefinitionListElement : ConfigElement<List<ModDefinition>>
     {
@@ -66,8 +67,8 @@ namespace _ReplaceString_.ConfigUI.ModUI
                 base.Recalculate();
                 return;
             }
-
-            Height.Set(MOD_HEIGHT * (Value.Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) || mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())).Count() + GetUnAddedMod().Count()) + TEXT_HEIGHT * 2 + 8, 0);
+            
+            Height.Set(Elements.Sum(ui => ui.Height.Pixels) + TEXT_HEIGHT + 8, 0);
             if (Parent != null)
             {
                 Parent.Height = Height;

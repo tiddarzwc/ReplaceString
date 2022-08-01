@@ -36,15 +36,6 @@ namespace _ReplaceString_.ConfigUI.ModUI
             if (!ReplaceString.Catcher.modInfos.TryGetValue(value.Name, out var info))
             {
                 info = ModInfo.Default with { displayName = value.DisplayName };
-                var tex = TextureAssets.Trash;
-                tex.Wait();
-                var deleteButton = new UIImageButton(tex)
-                {
-                    MarginLeft = Parent.GetDimensions().Width - ICON_SPACE - 32,
-                    MarginTop = ICON_SPACE
-                };
-                deleteButton.OnClick += DeleteButton_OnClick;
-                Append(deleteButton);
             }
             var icon = new UIImage(info.icon)
             {
@@ -78,6 +69,21 @@ namespace _ReplaceString_.ConfigUI.ModUI
                     text.TextColor = DefaultColor;
                 }
             };
+
+            if(!showLoadInfo || !ReplaceString.Instance.importStates.TryGetValue(value.Name, out var state) || state == ImportState.HjsonNotExist)
+            {
+                return;
+            }
+            var button = new UIImageButton(ReplaceString.Instance.importStates[value.Name] switch
+            {
+                ImportState.None or ImportState.HjsonNotExist => throw new System.NotImplementedException(),
+                _ => ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonPlay", ReLogic.Content.AssetRequestMode.ImmediateLoad)
+            })
+            {
+                Left = new StyleDimension(-28, 1),
+                Height = new StyleDimension(-11, 0.5f)
+            };
+            Append(button);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -98,12 +104,6 @@ namespace _ReplaceString_.ConfigUI.ModUI
                 }
                 HoverPosition = Main.MouseScreen + Vector2.One * 16;
             }
-        }
-
-        private void DeleteButton_OnClick(UIMouseEvent evt, UIElement listeningElement)
-        {
-            var list = Parent as ModDefinitionListElement;
-            list.ModList.Remove(value);
         }
 
         public ModDefinitionElement(ModDefinition value, bool showLoadInfo)

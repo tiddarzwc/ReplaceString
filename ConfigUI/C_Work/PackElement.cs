@@ -66,7 +66,7 @@ internal class PackElement : ConfigElement
             if (selected != null)
             {
                 SoundEngine.PlaySound(SoundID.MenuOpen);
-                var path = $"{Main.SavePath}/Mods/ReplaceString/{selected.Text}";
+                var path = $"{ReplaceString.BasePath}/{selected.Text}";
                 if (Directory.Exists(path))
                 {
                     var treeNode = Pack.Packup(path);
@@ -128,7 +128,7 @@ internal class PackElement : ConfigElement
 
 
         int margin = 30 + 6;
-        foreach (var dir in Directory.GetDirectories($"{Main.SavePath}/Mods/ReplaceString")
+        foreach (var dir in Directory.GetDirectories(ReplaceString.BasePath)
             .Where(p => Path.GetFileName(p).ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
             .Select(p => Path.GetFileName(p)))
         {

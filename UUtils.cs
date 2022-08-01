@@ -37,11 +37,11 @@ namespace _ReplaceString_
             name.Append(method.Name.RemoveChars(',', '`', '.'));
             if (method.IsGenericMethod)
             {
-                name.Append('g');
+                name.Append("_T");
             }
             else if (method.IsGenericMethodDefinition)
             {
-                name.Append('g');
+                name.Append("_T");
                 foreach (var param in method.GetGenericArguments())
                 {
                     name.Append('_');
@@ -65,11 +65,11 @@ namespace _ReplaceString_
             name.Append(method.Name.RemoveChars(',', '`', '.'));
             if (method.HasGenericParameters)
             {
-                name.Append('g');
+                name.Append("_T");
             }
             else if (method.IsGenericInstance)
             {
-                name.Append('g');
+                name.Append("_T");
                 foreach (var param in method.GenericParameters)
                 {
                     name.Append('_');

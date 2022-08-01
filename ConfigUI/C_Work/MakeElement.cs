@@ -72,8 +72,8 @@ internal class MakeElement : ConfigElement
                 if (baseHjson.IsSelected)
                 {
                     SoundEngine.PlaySound(SoundID.MenuOpen);
-                    var path = $"{Main.SavePath}/Mods/ReplaceString/{baseHjson.Text[2..]}";
-                    var path2 = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text[2..]}";
+                    var path = $"{ReplaceString.BasePath}/{baseHjson.Text[2..]}";
+                    var path2 = $"{ReplaceString.BasePath}/{hjson.Text[2..]}";
                     if (File.Exists(path) && File.Exists(path2))
                     {
                         Make.SetupFolds(path, path2);
@@ -86,7 +86,7 @@ internal class MakeElement : ConfigElement
                 else
                 {
                     SoundEngine.PlaySound(SoundID.MenuOpen);
-                    var path = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text[2..]}";
+                    var path = $"{ReplaceString.BasePath}/{hjson.Text[2..]}";
                     if (File.Exists(path))
                     {
                         Make.SetupFolds(path, path);
@@ -141,7 +141,7 @@ internal class MakeElement : ConfigElement
             if (hjson.IsSelected)
             {
                 SoundEngine.PlaySound(SoundID.MenuOpen);
-                var path = $"{Main.SavePath}/Mods/ReplaceString/{hjson.Text[2..]}";
+                var path = $"{ReplaceString.BasePath}/{hjson.Text[2..]}";
                 if (File.Exists(path))
                 {
                     Zip.ZipHjson(path);
@@ -220,7 +220,7 @@ internal class MakeElement : ConfigElement
         Append(baseHjson);
         baseHjson.Activate();
         //int margin = 30 + 6;
-        //foreach (var file in Directory.GetFiles($"{Main.SavePath}/Mods/ReplaceString")
+        //foreach (var file in Directory.GetFiles(ReplaceString.BasePath)
         //    .Where(p => Path.GetExtension(p) == ".hjson")
         //    .Where(p => Path.GetFileName(p).ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
         //    .Select(p => Path.GetFileName(p)))
