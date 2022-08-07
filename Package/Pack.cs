@@ -114,7 +114,7 @@ namespace _ReplaceString_.Package
             TreeNode[] nodes = args.Select(a => new TreeNode(a)).ToArray();
             using FileStream file = new FileStream(path, FileMode.Open);
             using CacheReader reader = new CacheReader(file);
-            string startWith = "\t\t";
+            string startWith = "\t\t" + (args.Length > 1 ? "\t" : "");
             while (!reader.EndOfStream)
             {
                 if (!ReadKey(reader, out string key))
@@ -125,7 +125,6 @@ namespace _ReplaceString_.Package
                 {
                     if (args.Length > 1)
                     {
-                        startWith += '\t';
                         while (!ReadKey(reader, out _)) { }
                     }
                     oldValue = ReadValue(reader, "Origin :", startWith);

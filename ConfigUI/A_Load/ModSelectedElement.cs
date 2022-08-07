@@ -33,8 +33,7 @@ namespace _ReplaceString_.ConfigUI.A_Load
                     Height = new StyleDimension(MOD_HEIGHT, 0)
                 };
                 Append(ui);
-                ui.Activate();
-                ui.OnClick += (evt, listeningElement) =>
+                ui.text.OnClick += delegate
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     var modlist = ModList;
@@ -44,6 +43,7 @@ namespace _ReplaceString_.ConfigUI.A_Load
                     modlist.needUpdate = true;
                     UIFocusInputTextFieldReplaced.instance.SetText("");
                 };
+                ui.Activate();
             }
         }
         private void ModSelectedElement_OnUpdate(UIElement affectedElement)

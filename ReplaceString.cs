@@ -82,8 +82,8 @@ public class ReplaceString : Mod
                     return;
                 }
                 importStates[name] = ImportState.Success;
-                string locFile = DefaultTranslation.Get(modFile) ?? Directory.GetFiles(BasePath, $"{name}*.loc").FirstOrDefault();
-                string hjsonFile = DefaultTranslation.Get(modFile) ?? Directory.GetFiles(BasePath, $"{name}*.hjson").FirstOrDefault();
+                string locFile = DefaultTranslation.Get(modFile.Name, "loc");
+                string hjsonFile = DefaultTranslation.Get(modFile.Name, "hjson");
                 if (hjsonFile is null && locFile is null)
                 {
                     importStates[name] = ImportState.HjsonNotExist;

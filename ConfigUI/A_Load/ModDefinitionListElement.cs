@@ -67,7 +67,7 @@ namespace _ReplaceString_.ConfigUI.A_Load
                 base.Recalculate();
                 return;
             }
-            
+
             Height.Set(Elements.Sum(ui => ui.Height.Pixels) + TEXT_HEIGHT + 8, 0);
             if (Parent != null)
             {
@@ -76,21 +76,36 @@ namespace _ReplaceString_.ConfigUI.A_Load
 
             base.Recalculate();
         }
+        public void ResetChildrenTop()
+        {
+            var it = Elements.GetEnumerator();
+            if(!it.MoveNext())
+            {
+                return;
+            }
+            var last = it.Current;
+            while(it.MoveNext())
+            {
+                var current = it.Current;
+                current.Top.Pixels = last.Top.Pixels + last.Height.Pixels;
+                last = current;
+            }
+        }
         public void ResetChildren()
         {
             Elements.Clear();
+            float top = TEXT_HEIGHT;
             foreach (var mod in Value.Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) || mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())).OrderBy(mod => mod.DisplayName))
             {
                 var ui = new ModDefinitionElement(mod, true)
                 {
-                    MarginLeft = 8,
-                    MarginTop = MOD_HEIGHT * Elements.Count + TEXT_HEIGHT,
+                    Left = new StyleDimension(8, 0),
+                    Top = new StyleDimension(top, 0),
                     Width = new StyleDimension(-16, 1),
                     Height = new StyleDimension(MOD_HEIGHT, 0)
                 };
                 Append(ui);
-                ui.Activate();
-                ui.OnClick += (evt, listeningElement) =>
+                ui.text.OnClick += delegate
                 {
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     ModList.Remove(ui.value);
@@ -98,10 +113,12 @@ namespace _ReplaceString_.ConfigUI.A_Load
                     UIFocusInputTextFieldReplaced.instance.SetText("");
                     needUpdate = true;
                 };
+                ui.Activate();
+                top += ui.Height.Pixels;
             }
             var select = new ModSelectedElement
             {
-                MarginTop = MOD_HEIGHT * Value.Where(mod => mod.Name.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()) || mod.DisplayName.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower())).Count() + TEXT_HEIGHT,
+                Top = new StyleDimension(top, 0),
                 Width = Width,
                 Height = new StyleDimension(TEXT_HEIGHT + GetUnAddedMod().Count() * MOD_HEIGHT, 0)
             };

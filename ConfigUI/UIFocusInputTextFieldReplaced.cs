@@ -104,7 +104,6 @@ namespace _ReplaceString_.ConfigUI
             this.hintText = hintText;
             instance = this;
             Text = string.Empty;
-            TextChanged = true;
         }
 
         public void SetText(string text)
