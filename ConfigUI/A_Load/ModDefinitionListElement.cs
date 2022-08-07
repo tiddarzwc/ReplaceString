@@ -3,10 +3,12 @@ using System.Linq;
 using _ReplaceString_.ConfigUI.ModUI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader.Config.UI;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;
 using static _ReplaceString_.ConfigUI.Constant;
@@ -146,10 +148,18 @@ namespace _ReplaceString_.ConfigUI.A_Load
             base.Draw(spriteBatch);
             if (!string.IsNullOrWhiteSpace(ModDefinitionElement.HoverString))
             {
+                var pos = Main.MouseScreen + Vector2.One * 16;
+                var size = FontAssets.ItemStack.Value.MeasureString(ModDefinitionElement.HoverString);
+                DrawPanel2(spriteBatch,
+                    pos,
+                    TextureAssets.SettingsPanel.Value,
+                    size.X + 16,
+                    size.Y + 12,
+                    new Color(44, 57, 105, 255)
+                    );
                 ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.ItemStack.Value,
-                    ModDefinitionElement.HoverString, ModDefinitionElement.HoverPosition,
+                    ModDefinitionElement.HoverString, pos + new Vector2(8,8),
                     Color.White, 0f, Vector2.Zero, Vector2.One, 0);
-                ModDefinitionElement.HoverString = null;
             }
         }
     }

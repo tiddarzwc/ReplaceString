@@ -25,7 +25,7 @@ public class ReplaceString : Mod
     public List<ILHook> ilHooks;
     public ModCatcher catcher;
     public Dictionary<string, ImportState> importStates = new Dictionary<string, ImportState>();
-    public Dictionary<string, (string name, string description)> importInfo = new Dictionary<string, (string name, string description)>();
+    public Dictionary<string, LocFileHead> importInfo = new Dictionary<string, LocFileHead>();
     public static readonly string[] blackList =
     {
         "ModLoader",
@@ -82,9 +82,8 @@ public class ReplaceString : Mod
                     return;
                 }
                 importStates[name] = ImportState.Success;
-                string locFile = DefaultTranslation.Get(modFile.Name, "loc");
-                string hjsonFile = DefaultTranslation.Get(modFile.Name, "hjson");
-                if (hjsonFile is null && locFile is null)
+                string transFile = Data.DefaultTranslation.Get(modFile.Name);
+                if (transFile == null)
                 {
                     importStates[name] = ImportState.HjsonNotExist;
                     return;
@@ -92,14 +91,14 @@ public class ReplaceString : Mod
 
                 try
                 {
-                    if (locFile != null)
+                    if (transFile.EndsWith(".loc"))
                     {
-                        import = new Import(Zip.UnZipHjson(locFile, out var info));
+                        import = new Import(Zip.UnZipHjson(transFile, out var info));
                         importInfo[modFile.Name] = info;
                     }
                     else
                     {
-                        using var file = new FileStream(hjsonFile, FileMode.Open);
+                        using var file = new FileStream(transFile, FileMode.Open);
                         import = new Import(HjsonValue.Load(file));
                     }
                 }

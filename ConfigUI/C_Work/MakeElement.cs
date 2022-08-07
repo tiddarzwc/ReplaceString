@@ -65,7 +65,7 @@ internal class MakeElement : ConfigElement
         {
             panel.BackgroundColor = new Color(44, 57, 105, 178);
         };
-        panel.OnClick += (evt, listeningElement) =>
+        panel.OnClick += delegate
         {
             if (hjson.IsSelected)
             {
@@ -136,7 +136,7 @@ internal class MakeElement : ConfigElement
         {
             panel2.BackgroundColor = new Color(44, 57, 105, 178);
         };
-        panel2.OnClick += (evt, listeningElement) =>
+        panel2.OnClick += delegate
         {
             if (hjson.IsSelected)
             {

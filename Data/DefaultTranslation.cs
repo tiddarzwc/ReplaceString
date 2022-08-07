@@ -34,23 +34,24 @@ namespace _ReplaceString_.Data
             }
             File.WriteAllText(ConfigPath, JsonSerializer.Serialize(instance));
         }
-        public static string Get(string name, string ext)
+        public static string Get(string modName)    
         {
-            string res = null;
-            var files = Directory.GetFiles(ReplaceString.BasePath, $"*.{ext}");
-            if(instance.DefaultPath.TryGetValue(name, out var val) && files.Any(path =>
+            if(instance.DefaultPath.TryGetValue(modName, out var path) && File.Exists(path))
             {
-                res = path;
-                return Path.GetFileName(path) == val;
-            }))
-            {
-                return res;
+                return path;
             }
-            return Directory.GetFiles(ReplaceString.BasePath, $"{name}*{ext}").FirstOrDefault();
+            var locs = Directory.GetFiles(ReplaceString.BasePath, "*.loc");
+            var hjsons = Directory.GetFiles(ReplaceString.BasePath, "*.hjson");
+            var res = locs.FirstOrDefault() ?? hjsons.FirstOrDefault();
+            if(res != null)
+            {
+                instance.DefaultPath[modName] = res;
+            }
+            return res;
         }
-        public static void Set(string mod, string path)
+        public static void Set(string modName, string fileName)
         {
-            instance.DefaultPath[mod] = path;
+            instance.DefaultPath[modName] = $"{ReplaceString.BasePath}/{fileName}";
             Save();
         }
     }

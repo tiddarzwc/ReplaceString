@@ -2,6 +2,7 @@
 using System.IO.Compression;
 using System.Linq;
 using _ReplaceString_.ConfigUI.C_Work;
+using _ReplaceString_.Data;
 using Hjson;
 using Terraria.Localization;
 
@@ -28,19 +29,27 @@ namespace _ReplaceString_.Package
                 .GetEnumValues()
                 .Cast<GameCulture.CultureName>()
                 .FirstOrDefault(c => c.ToString() == ModContent.GetInstance<WorkConfig>().culture)).Name);
-            using var zip = new GZipStream(File.OpenWrite($"{ReplaceString.BasePath}/{locPath}--{config.author.RemoveChars(Path.GetInvalidFileNameChars())}.loc"), CompressionLevel.Optimal);
+            using var zip = new GZipStream(File.OpenWrite($"{ReplaceString.BasePath}/{locPath}.loc"), CompressionLevel.Optimal);
             using var writer = new BinaryWriter(zip);
             writer.Write(config.author ?? string.Empty);
             writer.Write(config.description ?? string.Empty);
+            writer.Write(config.version ?? string.Empty);
             var hjson = HjsonValue.Load(File.OpenRead(path));
             hjson.Save(zip, Stringify.Plain);
         }
-        public static JsonValue UnZipHjson(string path, out (string name, string description) info)
+        public static JsonValue UnZipHjson(string path, out LocFileHead info)
         {
             using var zip = new GZipStream(File.OpenRead(path), CompressionMode.Decompress);
             using var reader = new BinaryReader(zip);
-            info = (reader.ReadString(), reader.ReadString());
+            info = new LocFileHead(reader.ReadString(), reader.ReadString(), reader.ReadString());
             return HjsonValue.Load(zip);
+        }
+
+        public static LocFileHead GetHead(string path)
+        {
+            using var zip = new GZipStream(File.OpenRead(path), CompressionMode.Decompress);
+            using var reader = new BinaryReader(zip);
+            return new LocFileHead(reader.ReadString(), reader.ReadString(), reader.ReadString());
         }
     }
 }

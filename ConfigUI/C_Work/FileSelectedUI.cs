@@ -14,8 +14,8 @@ namespace _ReplaceString_.ConfigUI.C_Work
         public UIText selected;
         public UIText text;
         public string hintText;
-        public bool IsSelected => text.Text != hintText;
-        public string Text => text.Text;
+        public bool IsSelected => selected.Text != hintText;
+        public string Text => selected.Text;
         public FileSelectedUI(string hintText)
         {
             this.hintText = hintText;
@@ -34,7 +34,7 @@ namespace _ReplaceString_.ConfigUI.C_Work
             {
                 BorderColor = Color.Transparent;
             };
-            text = new UIText(hintText)
+            selected = text = new UIText(hintText)
             {
                 Width = new StyleDimension(0, 1),
                 Height = new StyleDimension(30, 0),
@@ -48,9 +48,9 @@ namespace _ReplaceString_.ConfigUI.C_Work
             {
                 SoundEngine.PlaySound(SoundID.MenuTick);
                 Expand();
-                if (filePanel == null)
+                if (filePanel == null)//关掉
                 {
-                    if (selected != null)
+                    if (selected != text)
                     {
                         text.TextColor = Color.White;
                         text.SetText(selected.Text);
@@ -59,16 +59,18 @@ namespace _ReplaceString_.ConfigUI.C_Work
                     {
                         text.TextColor = Color.Gray;
                         text.SetText(hintText);
+                        selected = text;
                     }
                 }
-                else
+                else//打开
                 {
-                    if (selected != null)
+                    if (selected.Text != hintText)
                     {
                         selected = filePanel.Children.FirstOrDefault(u => u.Children.First() is UIText t && t.Text == selected.Text).Children.First() as UIText;
                         if (selected != null)
                         {
                             selected.TextColor = Color.Red;
+                            selected = text;
                         }
 
                         text.TextColor = Color.Gray;
@@ -148,10 +150,10 @@ namespace _ReplaceString_.ConfigUI.C_Work
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     if (selected == fileName)
                     {
-                        selected = null;
+                        selected = text;
                         fileName.TextColor = Color.Yellow;
                     }
-                    else if (selected == null)
+                    else if (selected == text)
                     {
                         selected = fileName;
                         fileName.TextColor = Color.Red;

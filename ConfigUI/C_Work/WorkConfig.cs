@@ -26,6 +26,8 @@ internal class WorkConfig : ModConfig
     public string author;
     [Label("Description (for zip)")]
     public string description;
+    [Label("Version (for zip)")]
+    public string version;
 
     [Label("Make")]
     [CustomModConfigItem(typeof(MakeElement))]

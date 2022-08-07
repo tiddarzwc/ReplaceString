@@ -61,7 +61,7 @@ namespace _ReplaceString_.Data
             {
                 val = className;
             }
-            else if (Regex.IsMatch(val, "[\\n\\r]"))
+            else if (val[0] == ' ' || val[0] == '\t' || Regex.IsMatch(val, "[\\n\\r]"))
             {
                 val = "\n" + space + "\t" + Regex.Replace(val, "[\\n\\r]", "\n" + space + "\t");
             }
