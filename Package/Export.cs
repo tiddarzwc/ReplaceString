@@ -12,13 +12,13 @@ namespace _ReplaceString_.Package;
 internal class Export
 {
     public Mod mod;
-    public TreeNode head;
+    public TreeNode root;
     public Export() { }
     public Export(Mod mod)
     {
         this.mod = mod;
-        head = new TreeNode(mod.Name);
-        _ = head + new TreeNode("ItemName") + new TreeNode("ItemTooltip")
+        root = new TreeNode(mod.Name);
+        _ = root + new TreeNode("ItemName") + new TreeNode("ItemTooltip")
                 + new TreeNode("ProjectileName") + new TreeNode("DamageClassName")
                 + new TreeNode("InfoDisplayName") + new TreeNode("BiomeName")
                 + new TreeNode("BuffName") + new TreeNode("BuffDescription")
@@ -29,41 +29,41 @@ internal class Export
         {
             if (t is ModItem modItem)
             {
-                head["ItemName"] += modItem.DisplayName;
-                head["ItemTooltip"] += modItem.Tooltip;
+                root["ItemName"] += modItem.DisplayName;
+                root["ItemTooltip"] += modItem.Tooltip;
             }
             else if (t is ModProjectile modProj)
             {
-                head["ProjectileName"] += modProj.DisplayName;
+                root["ProjectileName"] += modProj.DisplayName;
             }
             else if (t is DamageClass damage)
             {
-                head["DamageClassName"] += damage.ClassName;
+                root["DamageClassName"] += damage.ClassName;
             }
             else if (t is InfoDisplay info)
             {
-                head["InfoDisplayName"] += info.InfoName;
+                root["InfoDisplayName"] += info.InfoName;
             }
             else if (t is ModBiome modBiome)
             {
-                head["BiomeName"] += modBiome.DisplayName;
+                root["BiomeName"] += modBiome.DisplayName;
             }
             else if (t is ModBuff modBuff)
             {
-                head["BuffName"] += modBuff.DisplayName;
-                head["BuffDescription"] += modBuff.Description;
+                root["BuffName"] += modBuff.DisplayName;
+                root["BuffDescription"] += modBuff.Description;
             }
             else if (t is ModNPC modNPC)
             {
-                head["NPCName"] += modNPC.DisplayName;
+                root["NPCName"] += modNPC.DisplayName;
             }
             else if (t is ModPrefix modPrefix)
             {
-                head["Prefix"] += modPrefix.DisplayName;
+                root["Prefix"] += modPrefix.DisplayName;
             }
             else if (t is ModTile modTile)
             {
-                head["Containers"] += modTile.ContainerName;
+                root["Containers"] += modTile.ContainerName;
             }
         }
         GetMapEntry();
@@ -120,7 +120,7 @@ internal class Export
     }
     public void GetLdstr()
     {
-        GetLdstr(head, mod.GetValue<TmodFile>("File").GetModAssembly());
+        GetLdstr(root, mod.GetValue<TmodFile>("File").GetModAssembly());
     }
     public void GetMapEntry()
     {
@@ -162,12 +162,12 @@ internal class Export
             }
             mapEntry += node;
         }
-        head += mapEntry;
+        root += mapEntry;
     }
     public void Hjson(Stream stream)
     {
         using StreamWriter writer = new StreamWriter(stream);
-        writer.Write(head.BuildHjson(0));
+        writer.Write(root.BuildHjson(0));
     }
     public static CheckResult IsValid(Instruction ins)
     {

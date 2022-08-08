@@ -20,7 +20,6 @@ internal class MakeElement : ConfigElement
 {
     public FileSelectedUI hjson;
     public FileSelectedUI baseHjson;
-    //public UIText selected = null;
     public bool fliterHooked = false;
     public override void OnInitialize()
     {
@@ -115,63 +114,10 @@ internal class MakeElement : ConfigElement
         panel.Activate();
         #endregion
 
-        #region Zip
-        UIPanel panel2 = new UIPanel()
-        {
-            Left = new StyleDimension(50, 0),
-            Width = new StyleDimension(50, 0),
-            MarginLeft = 8,
-            MarginTop = 4,
-            HAlign = 0,
-            Height = new StyleDimension(26, 0)
-        };
-        panel2.OnMouseOver += (evt, listeningElement) =>
-        {
-            if (hjson.IsSelected)
-            {
-                panel2.BackgroundColor = new Color(44, 57, 105, 178).MultiplyRGBA(new Color(180, 180, 180));
-            }
-        };
-        panel2.OnMouseOut += (evt, listeningElement) =>
-        {
-            panel2.BackgroundColor = new Color(44, 57, 105, 178);
-        };
-        panel2.OnClick += delegate
-        {
-            if (hjson.IsSelected)
-            {
-                SoundEngine.PlaySound(SoundID.MenuOpen);
-                var path = $"{ReplaceString.BasePath}/{hjson.Text[2..]}";
-                if (File.Exists(path))
-                {
-                    Zip.ZipHjson(path);
-                }
-                else
-                {
-                    ResetChildren();
-                }
-            }
-        };
-        Append(panel2);
-
-        UIText text2 = new UIText("Zip")
-        {
-            HAlign = 0.5f,
-            VAlign = 0.5f,
-            TextColor = Color.Gray
-        };
-        text2.OnUpdate += delegate
-        {
-            text2.TextColor = hjson.IsSelected ? Color.White : Color.Gray;
-        };
-        panel2.Append(text2);
-        panel2.Activate();
-        #endregion
-
         UIPanel panel3 = new UIPanel()
         {
             Width = new StyleDimension(50, 0),
-            MarginLeft = 8 + 50 + 50,
+            MarginLeft = 8 + 50,
             MarginTop = 4,
             HAlign = 0,
             Height = new StyleDimension(26, 0)

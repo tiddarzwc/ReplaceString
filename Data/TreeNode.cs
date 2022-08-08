@@ -14,11 +14,12 @@ namespace _ReplaceString_.Data
     {
         public string name;
         public List<TreeNode> children = new List<TreeNode>();
-        public Dictionary<string, TreeNode> lookup = new Dictionary<string, TreeNode>();
+        public Dictionary<string, TreeNode> lookup;
         public TreeNode this[string name]
         {
             get
             {
+                lookup ??= new Dictionary<string, TreeNode>();
                 if (!lookup.TryGetValue(name, out TreeNode node))
                 {
                     node = Search(name);

@@ -14,7 +14,7 @@ namespace _ReplaceString_.Data
     {
         private static string ConfigPath => $"{ReplaceString.BasePath}/Config.json";
         private static DefaultTranslation instance = null;
-        public Dictionary<string, string> DefaultPath { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, string> DefaultFile { get; set; } = new Dictionary<string, string>();
         public static void Load()
         {
             if (!File.Exists(ConfigPath))
@@ -36,7 +36,7 @@ namespace _ReplaceString_.Data
         }
         public static string Get(string modName)    
         {
-            if(instance.DefaultPath.TryGetValue(modName, out var path) && File.Exists(path))
+            if(instance.DefaultFile.TryGetValue(modName, out var path) && File.Exists($"{ReplaceString.BasePath}/{path}"))
             {
                 return path;
             }
@@ -45,13 +45,13 @@ namespace _ReplaceString_.Data
             var res = locs.FirstOrDefault() ?? hjsons.FirstOrDefault();
             if(res != null)
             {
-                instance.DefaultPath[modName] = res;
+                instance.DefaultFile[modName] = Path.GetFileName(res);
             }
             return res;
         }
         public static void Set(string modName, string fileName)
         {
-            instance.DefaultPath[modName] = $"{ReplaceString.BasePath}/{fileName}";
+            instance.DefaultFile[modName] = fileName;
             Save();
         }
     }

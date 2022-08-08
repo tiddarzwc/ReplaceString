@@ -165,11 +165,19 @@ public class ModDefinitionElement : UIElement
                 Top = new StyleDimension(top, 0),
                 TextColor = Color.White
             };
+            string hoverString = string.Empty;
+            if (name.EndsWith(".loc"))
+            {
+                var meta = Zip.GetMetaData(file);
+                fileUI.SetText($"◆ {meta.displayName}");
+                hoverString = meta.ToString();
+            }
+
             filePanel.Append(fileUI);
             top += 30 + 6;
             fileUI.OnUpdate += delegate
             {
-                if (Path.GetFileName(Data.DefaultTranslation.Get(value.Name)) == fileUI.Text[2..] && fileUI.TextColor != Color.Yellow)
+                if (Data.DefaultTranslation.Get(value.Name) == name && fileUI.TextColor != Color.Yellow)
                 {
                     fileUI.TextColor = Color.Green;
                 }
@@ -182,12 +190,7 @@ public class ModDefinitionElement : UIElement
             fileUI.OnMouseOver += delegate
             {
                 fileUI.TextColor = Color.Yellow;
-                var path = $"{ReplaceString.BasePath}/{fileUI.Text[2..]}";
-                if (path.EndsWith(".loc") && File.Exists(path))
-                {
-                    var head = Zip.GetHead(path);
-                    HoverString = head.ToString();
-                }
+                HoverString = hoverString;
             };
 
             fileUI.OnMouseOut += delegate
@@ -202,14 +205,14 @@ public class ModDefinitionElement : UIElement
             fileUI.OnClick += delegate
             {
                 SoundEngine.PlaySound(SoundID.MenuOpen);
-                Data.DefaultTranslation.Set(value.Name, fileUI.Text[2..]);
+                Data.DefaultTranslation.Set(value.Name, name);
             };
 
         }
 
-        foreach (var (fileName, netFile) in Network.GetInfo(value.Name))
+        foreach (var netFile in Network.GetModInfo(value.Name).Where(net => files.All(local => local != net.fileName)))
         {
-            var fileUI = new UIText($"◇ {fileName}")
+            var fileUI = new UIText($"◇ {netFile.displayName}")
             {
                 TextOriginY = 0.5f,
                 Height = new StyleDimension(30, 0),
@@ -234,7 +237,7 @@ public class ModDefinitionElement : UIElement
             fileUI.OnClick += delegate
             {
                 SoundEngine.PlaySound(SoundID.MenuOpen);
-                Network.Download(fileName);
+                Network.Download(netFile.fileName);
                 ResetFiles();
             };
         }

@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using _ReplaceString_.Data;
 using Hjson;
 using Terraria;
@@ -29,6 +30,11 @@ namespace _ReplaceString_.Package
             {
                 Directory.CreateDirectory(path);
             }
+            using (var meta = File.OpenWrite($"{path}/build.json"))
+            {
+                JsonSerializer.Serialize(meta, new LocMetaData(), new JsonSerializerOptions() { WriteIndented = true });
+            }
+
             StringBuilder sb = new StringBuilder();
 
             var item = root["ItemName"];

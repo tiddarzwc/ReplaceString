@@ -7,21 +7,39 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using _ReplaceString_.Data;
+using _ReplaceString_.Package;
 
 namespace _ReplaceString_;
 
 public static class Network
 {
-    public static IEnumerable<(string fileName, LocFileHead head)> GetInfo(string modName)
+    /// <summary>
+    /// 根据fileName获得metaData
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    public static LocMetaData GetFileInfo(string fileName)
     {
-        return new(string fileName, LocFileHead head)[] { ("测试", new LocFileHead("", "", "")) };
-        return Array.Empty<(string fileName, LocFileHead head)>();
+        return new LocMetaData();
     }
 
+    /// <summary>
+    /// 根据modName获得一个mod所有汉化包的metaData
+    /// </summary>
+    /// <param name="modName"></param>
+    /// <returns></returns>
+    public static IEnumerable<LocMetaData> GetModInfo(string modName)
+    {
+        return new LocMetaData[] { new LocMetaData() };
+    }
+
+    /// <summary>
+    /// 根据fileName下载汉化包
+    /// </summary>
+    /// <param name="fileName"></param>
     public static void Download(string fileName)
     {
-
+        var targetDirector = ReplaceString.BasePath;
     }
-
 
 }

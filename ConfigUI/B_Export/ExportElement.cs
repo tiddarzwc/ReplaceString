@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using _ReplaceString_.ConfigUI.ModUI;
 using Microsoft.Xna.Framework;
@@ -60,8 +62,11 @@ internal class ExportElement : ConfigElement<object>
                 {
                     Directory.CreateDirectory(ReplaceString.BasePath);
                 }
-                using FileStream file = new FileStream($"{ReplaceString.BasePath}/{mod.Name}-{mod.Version.ToString().Replace(".", "")}-{Language.ActiveCulture.Name}.hjson", FileMode.Create);
+
+                string path = $"{ReplaceString.BasePath}/{mod.Name}-{mod.Version.ToString().Replace(".", "")}-{Language.ActiveCulture.Name}.hjson";
+                using FileStream file = new FileStream(path, FileMode.Create);
                 export.Hjson(file);
+                Utils.OpenFolder(Path.GetDirectoryName(path));
             }
         };
         Append(panel);

@@ -45,7 +45,7 @@ namespace _ReplaceString_.Package
             {
                 hookList.Add(name, new List<ILHook>());
             }
-            oldTree = new Export(mod).head;
+            oldTree = new Export(mod).root;
             AddTranslation(Language.ActiveCulture);
             AddMapEntry(Language.ActiveCulture);
             AddLdstrAndPath();

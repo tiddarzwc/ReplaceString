@@ -69,8 +69,9 @@ internal class PackElement : ConfigElement
                 var path = $"{ReplaceString.BasePath}/{selected.Text}";
                 if (Directory.Exists(path))
                 {
-                    var treeNode = Pack.Packup(path);
+                    var treeNode = Pack.Packup(path, out var meta);
                     File.WriteAllText($"{path}-packed.hjson", treeNode.BuildHjson(0).ToString());
+                    Zip.ZipHjson($"{path}-packed.hjson", meta);
                 }
                 else
                 {

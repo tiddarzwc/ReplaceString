@@ -106,6 +106,7 @@ internal class UpdateElement : ConfigElement
         {
             Left = new StyleDimension(8, 0),
             Width = new StyleDimension(-16, 1),
+            Top = new StyleDimension(84, 0)
         };
         newHjson.OnUpdate += evt =>
         {
@@ -122,6 +123,7 @@ internal class UpdateElement : ConfigElement
         {
             Left = new StyleDimension(8, 0),
             Width = new StyleDimension(-16, 1),
+            Top = new StyleDimension(132,0)
         };
         transHjson.OnUpdate += evt =>
         {

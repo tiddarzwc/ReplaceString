@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Terraria.ModLoader.Config;
 
 namespace _ReplaceString_.ConfigUI.C_Work;
@@ -22,12 +23,6 @@ internal class WorkConfig : ModConfig
         "Unknown"
     })]
     public string culture;
-    [Label("Author Name (for zip)")]
-    public string author;
-    [Label("Description (for zip)")]
-    public string description;
-    [Label("Version (for zip)")]
-    public string version;
 
     [Label("Make")]
     [CustomModConfigItem(typeof(MakeElement))]
@@ -40,6 +35,5 @@ internal class WorkConfig : ModConfig
     [Label("Update")]
     [CustomModConfigItem(typeof(UpdateElement))]
     public object update;
-
 }
 #pragma warning restore CS0649

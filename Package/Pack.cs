@@ -140,7 +140,7 @@ namespace _ReplaceString_.Package
                 root += node;
             }
         }
-        public static TreeNode Packup(string path)
+        public static TreeNode Packup(string path, out LocMetaData meta)
         {
             var fileName = Path.GetFileName(path);
             modName = fileName[..(fileName.IndexOf('-'))];
@@ -162,7 +162,7 @@ namespace _ReplaceString_.Package
             PackupLdstr($"{path}/Ldstr", root["Ldstr"]);
 
             CullEmpty(root);
-
+            meta = JsonSerializer.Deserialize<LocMetaData>(File.ReadAllText($"{path}/build.json"));
             return root;
         }
         private static void PackupLdstr(string path, TreeNode node)

@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text.Json;
 using _ReplaceString_.ConfigUI.C_Work;
 using _ReplaceString_.Data;
 using Hjson;
@@ -10,46 +12,29 @@ namespace _ReplaceString_.Package
 {
     public static class Zip
     {
-        public static void ZipHjson(string path)
+        public static void ZipHjson(string path, LocMetaData meta)
         {
-            var config = ModContent.GetInstance<WorkConfig>();
             var locPath = Path.GetFileNameWithoutExtension(path.Replace("-packed", ""));
-            int endIndex = locPath.Length, startIndex = locPath.Length - 1;
-            int temp = 2;
-            for (; startIndex > 0; startIndex--)
-            {
-                if (locPath[startIndex] == '-' && --temp == 0)
-                {
-                    startIndex++;
-                    break;
-                }
-            }
-            locPath = locPath.Replace(locPath[startIndex..endIndex], GameCulture.FromCultureName(
-                typeof(GameCulture.CultureName)
-                .GetEnumValues()
-                .Cast<GameCulture.CultureName>()
-                .FirstOrDefault(c => c.ToString() == ModContent.GetInstance<WorkConfig>().culture)).Name);
-            using var zip = new GZipStream(File.OpenWrite($"{ReplaceString.BasePath}/{locPath}.loc"), CompressionLevel.Optimal);
+            locPath = $"{locPath[..locPath.IndexOf('-')]}-{meta.fileName}-{meta.culture}.loc";
+            using var zip = new GZipStream(File.OpenWrite($"{ReplaceString.BasePath}/{locPath}"), CompressionLevel.Optimal);
             using var writer = new BinaryWriter(zip);
-            writer.Write(config.author ?? string.Empty);
-            writer.Write(config.description ?? string.Empty);
-            writer.Write(config.version ?? string.Empty);
+            writer.Write(JsonSerializer.Serialize(meta));
             var hjson = HjsonValue.Load(File.OpenRead(path));
             hjson.Save(zip, Stringify.Plain);
         }
-        public static JsonValue UnZipHjson(string path, out LocFileHead info)
+        public static JsonValue UnZipHjson(string path, out LocMetaData info)
         {
             using var zip = new GZipStream(File.OpenRead(path), CompressionMode.Decompress);
             using var reader = new BinaryReader(zip);
-            info = new LocFileHead(reader.ReadString(), reader.ReadString(), reader.ReadString());
+            info = JsonSerializer.Deserialize<LocMetaData>(reader.ReadString());
             return HjsonValue.Load(zip);
         }
 
-        public static LocFileHead GetHead(string path)
+        public static LocMetaData GetMetaData(string path)
         {
             using var zip = new GZipStream(File.OpenRead(path), CompressionMode.Decompress);
             using var reader = new BinaryReader(zip);
-            return new LocFileHead(reader.ReadString(), reader.ReadString(), reader.ReadString());
+            return JsonSerializer.Deserialize<LocMetaData>(reader.ReadString());
         }
     }
 }

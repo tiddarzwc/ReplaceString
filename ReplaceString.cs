@@ -25,7 +25,7 @@ public class ReplaceString : Mod
     public List<ILHook> ilHooks;
     public ModCatcher catcher;
     public Dictionary<string, ImportState> importStates = new Dictionary<string, ImportState>();
-    public Dictionary<string, LocFileHead> importInfo = new Dictionary<string, LocFileHead>();
+    public Dictionary<string, LocMetaData> importInfo = new Dictionary<string, LocMetaData>();
     public static readonly string[] blackList =
     {
         "ModLoader",
@@ -44,7 +44,7 @@ public class ReplaceString : Mod
         hooks = new List<Hook>();
         ilHooks = new List<ILHook>();
         Import import = null;
-        string logPath = $"{ReplaceString.BasePath}/log.txt";
+        string logPath = $"{BasePath}/log.txt";
         #region ConfigLoad
         LoadConfig config = new LoadConfig();
         try
@@ -82,7 +82,7 @@ public class ReplaceString : Mod
                     return;
                 }
                 importStates[name] = ImportState.Success;
-                string transFile = Data.DefaultTranslation.Get(modFile.Name);
+                string transFile = $"{BasePath}/{DefaultTranslation.Get(modFile.Name)}";
                 if (transFile == null)
                 {
                     importStates[name] = ImportState.HjsonNotExist;
@@ -143,6 +143,20 @@ public class ReplaceString : Mod
                 }
             }
         }));
+        #endregion
+
+        #region Update Check
+        var localFiles = Directory.GetFiles(BasePath, "*.loc");
+        foreach(var localFile in localFiles)
+        {
+            var meta = Zip.GetMetaData(localFile);
+            var net = Network.GetFileInfo(meta.fileName);
+
+            if(net.version > meta.version)
+            {
+                Network.Download(meta.fileName);
+            }
+        }
         #endregion
     }
 

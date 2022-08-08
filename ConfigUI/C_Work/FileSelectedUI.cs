@@ -70,7 +70,6 @@ namespace _ReplaceString_.ConfigUI.C_Work
                         if (selected != null)
                         {
                             selected.TextColor = Color.Red;
-                            selected = text;
                         }
 
                         text.TextColor = Color.Gray;
@@ -110,7 +109,7 @@ namespace _ReplaceString_.ConfigUI.C_Work
             int height = 0;
             foreach (var file in Directory.GetFiles(ReplaceString.BasePath)
                 .Where(p => Path.GetExtension(p) == ".hjson")
-                .Where(p => p.ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
+                .Where(p => Path.GetFileName(p).ToLower().StartsWith(UIFocusInputTextFieldReplaced.Text.ToLower()))
                 .Select(p => Path.GetFileName(p)))
             {
                 var ui = new UIPanel()
