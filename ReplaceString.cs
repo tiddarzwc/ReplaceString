@@ -62,6 +62,7 @@ public class ReplaceString : Mod
             File.AppendAllText(logPath, $"Config Load Fail, Config was reset \n Exception : {ex}\n");
             File.WriteAllText($"{Main.SavePath}/ModConfigs/_ReplaceString__ReplaceStringConfig.json", "{}");
         }
+
         #endregion
 
         #region PreModLoad
@@ -146,6 +147,11 @@ public class ReplaceString : Mod
         #endregion
 
         #region Update Check
+        if(!config.autoUpdate)
+        {
+            return;
+        }
+
         var localFiles = Directory.GetFiles(BasePath, "*.loc");
         foreach(var localFile in localFiles)
         {

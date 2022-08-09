@@ -14,13 +14,12 @@ namespace _ReplaceString_.Package
         {
             FileStream file;
             StreamWriter writer;
-            TreeNode root;
-            TreeNode transRoot;
+            TreeNode root, transRoot;
             Leaf node;
             using (file = File.OpenRead(path))
             {
                 root = TreeNode.ReadHjson(HjsonValue.Load(file));
-                path = $"{ReplaceString.BasePath}/{Path.GetFileNameWithoutExtension(path)}";
+                path = $"{ReplaceString.BasePath}/{Path.GetFileNameWithoutExtension(transPath)}";
             }
             using (file = File.OpenRead(transPath))
             {

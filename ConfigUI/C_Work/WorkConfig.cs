@@ -7,7 +7,7 @@ namespace _ReplaceString_.ConfigUI.C_Work;
 internal class WorkConfig : ModConfig
 {
     public override ConfigScope Mode => ConfigScope.ClientSide;
-    [Label("Culture (for zip)")]
+    [Label("Default Culture")]
     [DefaultValue("Chinese")]
     [OptionStrings(new string[]
     {
