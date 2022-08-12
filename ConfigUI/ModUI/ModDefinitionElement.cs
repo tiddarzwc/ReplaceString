@@ -237,7 +237,7 @@ public class ModDefinitionElement : UIElement
             fileUI.OnClick += delegate
             {
                 SoundEngine.PlaySound(SoundID.MenuOpen);
-                Network.Download(netFile.fileName);
+`                Network.Download(ReplaceString.BasePath, netFile.fileName);
                 ResetFiles();
             };
         }

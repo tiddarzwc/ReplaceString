@@ -1,30 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
+﻿using System.Globalization;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace _ReplaceString_.Data
 {
-    public struct LocMetaData
+    public class LocMetaData
     {
-        [JsonInclude]
-        public string author;
-        [JsonInclude]
-        public string description;
-        [JsonInclude]
-        public string fileName;
-        [JsonInclude]
-        public string displayName;
-        [JsonInclude]
-        public string culture;
-        [JsonInclude]
-        public Version version;
+        [JsonPropertyName("mod_name")] public string modName { get; set; }
+        public string author { get; set; }
+        public string description { get; set; }
+        [JsonPropertyName("filename")] public string fileName { get; set; }
+        [JsonPropertyName("display_name")] public string displayName { get; set; }
+        public string culture { get; set; }
+        public Version version { get; set; }
 
         public LocMetaData()
         {
+            modName = string.Empty;
             author = string.Empty;
             description = string.Empty;
             fileName = "Default";
@@ -35,7 +26,7 @@ namespace _ReplaceString_.Data
 
         public override string ToString()
         {
-            return $"{author} - {version}\n{description}";
+            return $"{displayName} by {author}  for {modName} - {version}\n{description}";
         }
     }
 }

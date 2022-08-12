@@ -160,7 +160,7 @@ public class ReplaceString : Mod
 
             if(net.version > meta.version)
             {
-                Network.Download(meta.fileName);
+                Network.Download(BasePath, meta.fileName);
             }
         }
         #endregion

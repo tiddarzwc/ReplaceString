@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net.Http.Json;
 using _ReplaceString_.Data;
-using _ReplaceString_.Package;
 
 namespace _ReplaceString_;
 
 public static class Network
 {
+    public const string BackendAddress = "http://localhost:8888";
+
     /// <summary>
     /// 根据fileName获得metaData
     /// </summary>
@@ -20,7 +14,8 @@ public static class Network
     /// <returns></returns>
     public static LocMetaData GetFileInfo(string fileName)
     {
-        return new LocMetaData();
+        using var client = new HttpClient();
+        return client.GetFromJsonAsync<LocMetaData>($"{BackendAddress}/meta?file={fileName}").Result;
     }
 
     /// <summary>
@@ -28,18 +23,21 @@ public static class Network
     /// </summary>
     /// <param name="modName"></param>
     /// <returns></returns>
-    public static IEnumerable<LocMetaData> GetModInfo(string modName)
+    public static LocMetaData[] GetModInfo(string modName)
     {
-        return new LocMetaData[] { new LocMetaData() };
+        using var client = new HttpClient();
+        return client.GetFromJsonAsync<LocMetaData[]>($"{BackendAddress}/list?mod={modName}").Result;
     }
 
     /// <summary>
     /// 根据fileName下载汉化包
     /// </summary>
     /// <param name="fileName"></param>
-    public static void Download(string fileName)
+    /// <param name="targetDir"></param>
+    public static void Download(string targetDir, string fileName)
     {
-        var targetDirector = ReplaceString.BasePath;
+        using var file = new FileStream(Path.Combine(targetDir, fileName), FileMode.Create);
+        using var client = new HttpClient();
+        client.GetStreamAsync($"{BackendAddress}/download?file={fileName}").Result.CopyTo(file);
     }
-
 }
